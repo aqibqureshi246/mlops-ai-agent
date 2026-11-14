@@ -4,4 +4,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /
 USER airflow
 COPY requirements/airflow-lock.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir --require-hashes -r /tmp/requirements.txt && pip check
-RUN python -c "from airflow.sdk import dag, task; import mlflow; import psycopg2"
+RUN python -c "from airflow.sdk import dag, task; import mlflow; import psycopg2; import asyncpg"

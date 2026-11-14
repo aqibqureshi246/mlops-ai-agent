@@ -11,3 +11,4 @@ apache-airflow-providers-common-io==1.5.4
 apache-airflow-providers-common-sql==1.27.0
 apache-airflow-providers-smtp==2.0.3
 apache-airflow-providers-standard==1.1.0
+asyncpg==0.30.0
