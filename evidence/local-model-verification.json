@@ -1,0 +1,144 @@
+{
+  "observed_at": "2026-11-14T19:13:45.925337+00:00",
+  "scope": "Actual local file-backed MLflow run and FastAPI TestClient; no Airflow or Kubernetes execution claimed",
+  "run": {
+    "run_id": "3b1b5f966b8c45f4938cd24bc4c319c3",
+    "status": "FINISHED",
+    "start_time_ms": 1794683400927,
+    "end_time_ms": 1794683401186,
+    "metrics": {
+      "accuracy": 0.9333333333333333,
+      "f1_macro": 0.9333333333333332
+    },
+    "params": {
+      "C": "1.0",
+      "max_iter": "500",
+      "model": "StandardScaler+LogisticRegression",
+      "seed": "42",
+      "test_size": "0.2"
+    },
+    "provenance": {
+      "airflow.run_id": "local",
+      "code.git_commit": "98dce180f083d5e64502fb3e5510c1797909a22e",
+      "data.git_commit": "98dce180f083d5e64502fb3e5510c1797909a22e",
+      "data.hash": "4224576f0267bf88902f87f0f6200967",
+      "data.pointer": "data/iris.csv.dvc",
+      "quality.passed": "true",
+      "quality.threshold": "0.9"
+    },
+    "artifacts": [
+      {
+        "path": "model_bundle",
+        "is_dir": true
+      },
+      {
+        "path": "provenance.json",
+        "is_dir": false
+      },
+      {
+        "path": "quality.json",
+        "is_dir": false
+      },
+      {
+        "path": "split.json",
+        "is_dir": false
+      }
+    ]
+  },
+  "selection": {
+    "metric": "f1_macro",
+    "maximize": true,
+    "recent_window": 5,
+    "comparison": [
+      {
+        "run_id": "3b1b5f966b8c45f4938cd24bc4c319c3",
+        "status": "FINISHED",
+        "start_time_ms": 1794683400927,
+        "end_time_ms": 1794683401186,
+        "metrics": {
+          "accuracy": 0.9333333333333333,
+          "f1_macro": 0.9333333333333332
+        },
+        "params": {
+          "C": "1.0",
+          "max_iter": "500",
+          "model": "StandardScaler+LogisticRegression",
+          "seed": "42",
+          "test_size": "0.2"
+        },
+        "provenance": {
+          "airflow.run_id": "local",
+          "code.git_commit": "98dce180f083d5e64502fb3e5510c1797909a22e",
+          "data.git_commit": "98dce180f083d5e64502fb3e5510c1797909a22e",
+          "data.hash": "4224576f0267bf88902f87f0f6200967",
+          "data.pointer": "data/iris.csv.dvc",
+          "quality.passed": "true",
+          "quality.threshold": "0.9"
+        }
+      }
+    ],
+    "best": {
+      "run_id": "3b1b5f966b8c45f4938cd24bc4c319c3",
+      "status": "FINISHED",
+      "start_time_ms": 1794683400927,
+      "end_time_ms": 1794683401186,
+      "metrics": {
+        "accuracy": 0.9333333333333333,
+        "f1_macro": 0.9333333333333332
+      },
+      "params": {
+        "C": "1.0",
+        "max_iter": "500",
+        "model": "StandardScaler+LogisticRegression",
+        "seed": "42",
+        "test_size": "0.2"
+      },
+      "provenance": {
+        "airflow.run_id": "local",
+        "code.git_commit": "98dce180f083d5e64502fb3e5510c1797909a22e",
+        "data.git_commit": "98dce180f083d5e64502fb3e5510c1797909a22e",
+        "data.hash": "4224576f0267bf88902f87f0f6200967",
+        "data.pointer": "data/iris.csv.dvc",
+        "quality.passed": "true",
+        "quality.threshold": "0.9"
+      }
+    },
+    "caveat": "Best measured candidate in this recent window; production readiness requires separate checks."
+  },
+  "historical_dataset": {
+    "git_commit": "98dce180f083d5e64502fb3e5510c1797909a22e",
+    "dataset": "data/iris.csv.dvc",
+    "recorded_hash": "4224576f0267bf88902f87f0f6200967",
+    "steps": [
+      "git worktree add --detach ../mlops-reproduce 98dce180f083d5e64502fb3e5510c1797909a22e",
+      "cd ../mlops-reproduce",
+      "python -m venv .venv",
+      "Activate the new .venv for your shell",
+      "python -m pip install uv==0.7.3",
+      "uv sync --locked",
+      "dvc remote add --local -d storage <absolute-path-to-existing-remote>",
+      "dvc pull data/iris.csv.dvc",
+      "dvc status"
+    ],
+    "note": "Instructions only. Requires access to the DVC remote; current checkout is untouched."
+  },
+  "readiness": {
+    "status": "ready",
+    "model_run_id": "3b1b5f966b8c45f4938cd24bc4c319c3"
+  },
+  "application_version": {
+    "app_version": "1.0.0",
+    "model_run_id": "3b1b5f966b8c45f4938cd24bc4c319c3",
+    "dataset": {
+      "code.git_commit": "98dce180f083d5e64502fb3e5510c1797909a22e",
+      "data.git_commit": "98dce180f083d5e64502fb3e5510c1797909a22e",
+      "data.hash": "4224576f0267bf88902f87f0f6200967",
+      "data.pointer": "data/iris.csv.dvc"
+    }
+  },
+  "prediction": {
+    "class_id": 0,
+    "class_name": "setosa",
+    "model_run_id": "3b1b5f966b8c45f4938cd24bc4c319c3"
+  }
+}

@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import os
 import subprocess
 from pathlib import Path
 from uuid import uuid4
@@ -12,7 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def command(*args, cwd=ROOT):
-    return subprocess.check_output(args, cwd=cwd, text=True).strip()
+    return subprocess.check_output(
+        args, cwd=cwd, text=True, env={**os.environ, "DVC_NO_ANALYTICS": "1"}
+    ).strip()
 
 
 def main():
@@ -50,7 +53,20 @@ def main():
         print("Historical dataset retrieved and hash verified in an isolated worktree.")
     finally:
         # The absolute target was checked against the dedicated runtime directory above.
-        command("git", "worktree", "remove", "--force", str(worktree))
+        removed = subprocess.run(
+            ["git", "worktree", "remove", "--force", str(worktree)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if removed.returncode:
+            # Windows can leave an empty directory after Git removes its registration.
+            # Only remove that exact, already scoped, empty directory; never delete other data.
+            if worktree.exists():
+                worktree.rmdir()
+            registered = command("git", "worktree", "list", "--porcelain")
+            if f"worktree {worktree.as_posix()}\n" in registered + "\n":
+                raise RuntimeError("Reproduction checkout cleanup did not complete")
 
 
 if __name__ == "__main__":

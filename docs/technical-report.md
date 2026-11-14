@@ -40,13 +40,14 @@ ConfigMap, probes, resource requests/limits and restricted container security se
 
 ## Validation record
 
-Local verification completed with 43 passing tests and 85% statement coverage. Lint, formatting and Compose configuration checks passed. DVC versioning, local remote storage and isolated worktree recovery were exercised. Live Airflow, Kubernetes and LLM conversations remain pending because Docker Desktop is unavailable on the current approximately 4 GB host. The manual GitHub workflow is provided for complete live verification. No unexecuted demonstration is represented as successful.
+Local verification completed with 43 passing tests and 85% statement coverage. Lint, formatting and Compose configuration checks passed. DVC versioning, local remote storage and isolated worktree recovery were exercised. Live Airflow, Kubernetes and LLM conversations remain pending because Docker Desktop is unavailable on the current approximately 4 GB host. The manual GitHub workflow is provided for complete live verification; hosted runs are currently awaiting runner availability. No unexecuted demonstration is represented as successful.
 
 | Evidence | Expected export | Status |
 |---|---|---|
 | Automated tests | evidence/automated-tests.json | 43 passed locally; two dependency deprecation warnings |
 | Local dataset and remote | evidence/local-dvc.json | Hash matches; working and remote DVC status clean |
-| DVC reproduction | evidence/dvc-reproduction.json | Pending live execution |
+| DVC reproduction | evidence/dvc-reproduction.json | Verified locally against published Git commit |
+| Local training and prediction | evidence/local-model-verification.json | Actual macro F1 0.933333; quality gate passed; prediction verified |
 | Successful training and recovery | evidence/pipeline-none.json | Pending live execution |
 | Validation rejection | evidence/pipeline-validation.json | Pending live execution |
 | Quality-gate rejection | evidence/pipeline-quality.json | Pending live execution |
@@ -105,3 +106,7 @@ grow. Direct dependencies are pinned and a complete cross-platform dependency lo
 ## Unexpected failure resolved during verification
 
 DVC 3.59.2 failed with an import of the removed private pathspec symbol _DIR_MARK when resolved against pathspec 1.1.1. The dependency is now explicitly pinned to pathspec 0.12.1 in the project and cross-platform lock. Actual dvc add, local remote push, pipeline-graph validation and an isolated worktree remote-pull test subsequently passed. This is an observed dependency failure, distinct from the two planned deliberately injected Airflow failures above.
+
+## Published-source local verification
+
+The dataset was retrieved into an isolated worktree at commit 98dce180f083d5e64502fb3e5510c1797909a22e and its byte hash matched the DVC pointer. A real local file-backed MLflow training run recorded accuracy 0.9333333333 and macro F1 0.9333333333. Its 0.90 quality gate passed, and the approved bundle returned a successful readiness check, matching application provenance and a setosa prediction through FastAPI TestClient. The exported scope explicitly distinguishes these local checks from pending real Airflow, Kubernetes and LLM demonstrations.

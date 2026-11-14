@@ -1,0 +1,8 @@
+{
+  "git_commit": "98dce180f083d5e64502fb3e5510c1797909a22e",
+  "pointer": "data/iris.csv.dvc",
+  "recorded_hash": "4224576f0267bf88902f87f0f6200967",
+  "retrieved_hash": "4224576f0267bf88902f87f0f6200967",
+  "matches": true,
+  "method": "Isolated detached Git worktree, dvc pull, byte-hash verification"
+}
