@@ -1,0 +1,7 @@
+# Ignore local environments and transient working files during DVC traversal.
+.venv/
+.tmp/
+.runtime/
+.pytest_cache/
+.ruff_cache/
+__pycache__/

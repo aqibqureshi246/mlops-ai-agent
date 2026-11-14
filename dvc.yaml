@@ -1,0 +1,26 @@
+stages:
+  validate:
+    cmd: python -m training.train validate
+    deps: [data/iris.csv, training/train.py]
+    outs: [artifacts/local/validated.csv, artifacts/local/provenance.json]
+  preprocess:
+    cmd: python -m training.train preprocess
+    deps: [artifacts/local/validated.csv, training/train.py]
+    outs: [artifacts/local/split.joblib, artifacts/local/split.json]
+  train:
+    cmd: python -m training.train train
+    deps: [artifacts/local/split.joblib, training/train.py]
+    outs: [artifacts/local/model.joblib, artifacts/local/params.json]
+  evaluate:
+    cmd: python -m training.train evaluate
+    deps: [artifacts/local/model.joblib, artifacts/local/params.json, artifacts/local/split.joblib, artifacts/local/provenance.json, artifacts/local/split.json, training/train.py]
+    outs:
+      - artifacts/local/evaluation.json:
+          cache: false
+  quality:
+    cmd: python -m training.train quality
+    deps: [artifacts/local/evaluation.json, artifacts/local/model.joblib, artifacts/local/provenance.json, training/train.py]
+    outs:
+      - artifacts/local/quality.json:
+          cache: false
+      - artifacts/local/approved

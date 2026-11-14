@@ -1,0 +1,13 @@
+{
+  "observed_at": "2026-11-14T18:59:16.545121+00:00",
+  "pointer": "data/iris.csv.dvc",
+  "recorded_hash": "4224576f0267bf88902f87f0f6200967",
+  "working_hash": "4224576f0267bf88902f87f0f6200967",
+  "matches": true,
+  "working_status": {},
+  "remote_status": {},
+  "remote_name": "storage",
+  "remote_type": "local filesystem",
+  "git_commit": null,
+  "note": "The project has no initial commit yet. Historical project provenance is verified after publication; isolated worktree recovery is separately tested in pytest."
+}

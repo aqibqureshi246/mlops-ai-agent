@@ -1,0 +1,96 @@
+name: Live demonstration
+on:
+  workflow_dispatch:
+    inputs:
+      publish_evidence:
+        description: Commit sanitized live evidence back to main after successful verification
+        type: boolean
+        default: true
+permissions:
+  contents: write
+concurrency:
+  group: live-demo-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  demonstration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: 0.7.3
+      - name: Install locked environment
+        run: |
+          uv sync --locked --extra dev --python python
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> "$GITHUB_PATH"
+      - name: Install and test
+        run: |
+          ruff check .
+          ruff format --check .
+          pytest --junitxml=.tmp/test-results.xml
+          python scripts/export_test_results.py
+          python scripts/setup_local.py
+          python scripts/prepare_data.py
+      - name: Verify isolated DVC reproduction
+        run: python scripts/verify_reproduction.py
+      - name: Launch tracking and orchestration
+        run: docker compose up -d --build --wait --wait-timeout 360
+      - name: Validate DAG import
+        run: |
+          docker compose exec -T airflow python scripts/check_dag.py
+          python scripts/wait_for_dag.py
+      - name: Compare candidate and execute required workflow scenarios
+        run: |
+          python -m training.train all --c 0.3 --work artifacts/candidate-03
+          python -m training.train all --c 3.0 --work artifacts/candidate-30
+          python scripts/run_pipeline.py --confirm
+          python scripts/run_pipeline.py --inject-failure validation --confirm
+          python scripts/run_pipeline.py --inject-failure quality --confirm
+          python scripts/run_pipeline.py --confirm
+      - uses: helm/kind-action@v1.12.0
+        with:
+          cluster_name: mlops-a3
+          node_image: kindest/node:v1.32.2
+      - name: Deploy verified bundle and capture real inference
+        run: |
+          python scripts/deploy.py --bundle "$(cat .runtime/latest-approved.txt)" --confirm
+          python scripts/configure_kube_access.py --confirm
+          kubectl --context kind-mlops-a3 -n mlops port-forward service/prediction-api 8000:80 > .tmp/port-forward.log 2>&1 &
+          python scripts/export_cluster.py --api-url http://localhost:8000
+      - name: Configure hosted LLM or local Ollama
+        env:
+          HOSTED_LLM_KEY: ${{ secrets.LLM_API_KEY }}
+          HOSTED_LLM_URL: ${{ vars.LLM_BASE_URL }}
+          HOSTED_LLM_MODEL: ${{ vars.LLM_MODEL }}
+        run: python scripts/configure_demo_llm.py
+      - name: Capture five actual agent conversations
+        run: python scripts/collect_demo.py
+      - name: Update verified report
+        run: python scripts/update_report.py
+      - name: Review evidence for secrets and irrelevant files
+        run: |
+          git add evidence docs/technical-report.md
+          python scripts/check_submission.py
+      - name: Publish successful evidence
+        if: inputs.publish_evidence && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git diff --cached --quiet || git commit -m "Record live demonstration evidence"
+          git push origin HEAD:main
+      - name: Export observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-demonstration-evidence
+          path: |
+            evidence/
+            docs/technical-report.md
+      - name: Shut down demonstration services
+        if: always()
+        run: docker compose --profile local-llm down

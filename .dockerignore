@@ -1,0 +1,15 @@
+.git
+.venv
+.tmp
+.runtime
+.env
+.env.*
+__pycache__
+.pytest_cache
+.ruff_cache
+artifacts
+evidence
+*.pdf
+dist
+build
+.dvc/cache

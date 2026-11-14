@@ -1,0 +1,7 @@
+FROM apache/airflow:3.0.1-python3.12
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/* && git config --system --add safe.directory /opt/project
+USER airflow
+COPY requirements/airflow.txt /tmp/requirements.txt
+COPY requirements/constraints.txt /tmp/constraints.txt
+RUN pip install --no-cache-dir -c /tmp/constraints.txt -r /tmp/requirements.txt

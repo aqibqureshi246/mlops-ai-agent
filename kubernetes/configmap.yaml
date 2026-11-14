@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prediction-config
+  namespace: mlops
+data:
+  MODEL_BUNDLE: /app/model
+  FAIL_READINESS: "false"
+  LOG_LEVEL: INFO
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
