@@ -41,7 +41,7 @@ jobs:
         run: docker compose up -d --build --wait --wait-timeout 360
       - name: Validate DAG import
         run: |
-          docker compose exec -T airflow python scripts/check_dag.py
+          docker compose exec -T airflow python /opt/project/scripts/check_dag.py
           python scripts/wait_for_dag.py
       - name: Compare candidate and execute required workflow scenarios
         run: |
