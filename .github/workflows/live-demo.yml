@@ -82,6 +82,9 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git diff --cached --quiet || git commit -m "Record live demonstration evidence"
           git push origin HEAD:main
+      - name: Capture service failure diagnostics
+        if: failure()
+        run: python scripts/collect_service_diagnostics.py
       - name: Export observations
         if: always()
         uses: actions/upload-artifact@v4

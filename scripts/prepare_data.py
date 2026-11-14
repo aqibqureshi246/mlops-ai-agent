@@ -36,6 +36,8 @@ def main():
             raise ValueError(
                 "Regenerated data disagrees with committed pointer; do not overwrite provenance"
             )
+        # A fresh clone has the pointer but no content-addressed cache yet.
+        command("dvc", "commit", "data/iris.csv.dvc")
     else:
         command("dvc", "add", "data/iris.csv")
     args.remote.resolve().mkdir(parents=True, exist_ok=True)
