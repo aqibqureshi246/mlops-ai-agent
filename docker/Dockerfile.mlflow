@@ -1,6 +1,6 @@
 FROM python:3.12.10-slim
-COPY requirements/constraints.txt /tmp/constraints.txt
-RUN pip install --no-cache-dir -c /tmp/constraints.txt mlflow==2.22.0
+COPY requirements/mlflow-lock.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir --require-hashes -r /tmp/requirements.txt && pip check && python -c "from mlflow.store.tracking.sqlalchemy_store import SqlAlchemyStore"
 RUN useradd --uid 10002 --create-home mlflow && mkdir -p /mlflow/artifacts && chown -R mlflow /mlflow
 USER mlflow
 WORKDIR /mlflow
