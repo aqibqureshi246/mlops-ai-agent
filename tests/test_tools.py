@@ -95,6 +95,38 @@ def test_mlflow_details_include_provenance_and_artifacts():
     assert result["artifacts"][0]["path"] == "model_bundle"
 
 
+def test_registry_mlflow_details_resolve_remote_artifacts_from_local_default(tmp_path, monkeypatch):
+    from uuid import uuid4
+
+    import mlflow
+    from mlflow.store.artifact.http_artifact_repo import HttpArtifactRepository
+
+    from agent.config import Settings
+    from agent.factory import build_registry
+
+    original = mlflow.get_tracking_uri()
+    uri = "http://tracking.example.invalid:5000"
+    client = mlflow.MlflowClient(tracking_uri=uri)
+    run_id = uuid4().hex
+    run = make_run(run_id)
+    run.info.artifact_uri = f"mlflow-artifacts:/1/{run_id}/artifacts"
+    monkeypatch.setattr(client._tracking_client, "get_run", lambda run_id: run)
+    monkeypatch.setattr(mlflow, "MlflowClient", lambda **kwargs: client)
+    monkeypatch.setattr(
+        HttpArtifactRepository,
+        "list_artifacts",
+        lambda self, path=None: [NS(path="quality.json", is_dir=False)],
+    )
+    try:
+        mlflow.set_tracking_uri((tmp_path / "unrelated-local-tracking").as_uri())
+        registry = build_registry(Settings(mlflow_tracking_uri=uri))
+        result = registry.execute("mlflow_run_details", {"run_id": run_id}, "artifact-test")
+        assert result.status == "ok", result.error
+        assert result.data["artifacts"] == [{"path": "quality.json", "is_dir": False}]
+    finally:
+        mlflow.set_tracking_uri(original)
+
+
 def test_airflow_uses_authenticated_v2_api_and_returns_real_failed_tasks():
     calls = []
 

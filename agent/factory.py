@@ -24,8 +24,10 @@ from agent.tools.mlflow_tools import (
 
 
 def build_registry(settings: Settings) -> Registry:
-    from mlflow import MlflowClient
+    from mlflow import MlflowClient, set_tracking_uri
 
+    # MLflow's proxied artifact resolver uses the process-level URI as well as the client.
+    set_tracking_uri(settings.mlflow_tracking_uri)
     os.environ.setdefault("MLFLOW_HTTP_REQUEST_TIMEOUT", str(int(settings.request_timeout)))
     os.environ.setdefault("MLFLOW_HTTP_REQUEST_MAX_RETRIES", "1")
     registry = Registry()
