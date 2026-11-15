@@ -135,6 +135,38 @@ def test_duplicate_calls_are_bounded():
     handler.assert_called_once()
 
 
+def test_missing_observation_prompts_the_planner_again_without_scripted_calls():
+    handler = Mock(return_value={"replicas": 2})
+    planner = ScriptedPlanner([], [("inspect", {})])
+    result = Orchestrator(registry_with(handler), planner, Settings()).chat(
+        "Check health", required_tools={"inspect"}
+    )
+    assert result.evidence[0].data == {"replicas": 2}
+    handler.assert_called_once_with()
+    assert not result.uncertainties
+
+
+def test_required_observations_never_fall_back_to_automatic_tool_execution():
+    handler = Mock(return_value={"replicas": 2})
+    result = Orchestrator(registry_with(handler), ScriptedPlanner(), Settings(max_rounds=2)).chat(
+        "Check health", required_tools={"inspect"}
+    )
+    handler.assert_not_called()
+    assert not result.evidence
+    assert any(
+        "Required observations remain unavailable: inspect" in u for u in result.uncertainties
+    )
+
+
+def test_observation_requirements_cannot_authorize_mutations():
+    handler = Mock()
+    with pytest.raises(ValueError, match="read-only"):
+        Orchestrator(registry_with(handler, mutating=True), ScriptedPlanner(), Settings()).chat(
+            "Check health", required_tools={"inspect"}
+        )
+    handler.assert_not_called()
+
+
 def test_integration_correlates_all_four_services_without_retraining():
     registry = Registry()
     data = {

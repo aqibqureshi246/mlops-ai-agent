@@ -16,6 +16,10 @@ Also inspect dvc_dataset_version and dvc_data_status for current data. Do not re
 For failed workflows: use airflow_task_instances on the returned run ID, then airflow_task_logs
 for the failed task. For unavailable prediction APIs: get deployments, pods, services, events,
 and available pod logs. Do not label replicas healthy from phase Running alone.
+Use schema defaults for the configured dataset pointer, DAG and namespace unless the user specifies
+another valid value. Never substitute placeholder names or invented identifiers. Dataset byte hashes
+are not pointer paths. After selecting a model, call mlflow_run_details with the returned best.run_id.
+For changed-data questions, call dvc_data_status; a clean Git pointer alone does not establish this.
 For training or restart requests: propose the relevant mutating tool. It will require a separate
 user confirmation. Never put a confirmation token into tool arguments.
 If a tool fails, state that it is unknown; do not retry indefinitely. Stop when enough evidence
@@ -218,11 +222,33 @@ class Orchestrator:
     def __init__(self, registry: Registry, planner, settings: Settings):
         self.registry, self.planner, self.settings = registry, planner, settings
 
-    def chat(self, message: str, owner: str = "local-cli") -> AgentResponse:
+    def chat(
+        self, message: str, owner: str = "local-cli", *, required_tools: set[str] | None = None
+    ) -> AgentResponse:
         if not message.strip() or len(message) > 4000:
             raise ValueError("Message must contain 1 to 4000 characters")
+        required = set(required_tools or ())
+        if any(
+            name not in self.registry.tools or self.registry.tools[name].mutating
+            for name in required
+        ):
+            raise ValueError("Required observations must name registered read-only tools")
         request_id = uuid4().hex
-        messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": message}]
+        scope = (
+            f"\nConfigured DAG: {self.settings.approved_dag}; Kubernetes namespace: "
+            f"{self.settings.kube_namespace}; Deployment: {self.settings.deployment_name}."
+        )
+        messages = [{"role": "system", "content": SYSTEM + scope}]
+        messages.append({"role": "user", "content": message})
+        if required:
+            messages.append(
+                {
+                    "role": "user",
+                    "content": "Collect successful observations from these tools before finishing: "
+                    + ", ".join(sorted(required))
+                    + ". Obtain dependent IDs from tool results, and use schema defaults for scope.",
+                }
+            )
         evidence, pending, planner_errors = [], [], []
         seen = set()
         for _ in range(self.settings.max_rounds):
@@ -236,6 +262,22 @@ class Orchestrator:
                 )
                 break
             if not calls:
+                missing = required - {e.tool for e in evidence if e.status == "ok"}
+                if missing:
+                    messages.extend(
+                        [
+                            assistant_message,
+                            {
+                                "role": "user",
+                                "content": "The investigation is incomplete. Still missing successful "
+                                "observations from: "
+                                + ", ".join(sorted(missing))
+                                + ". Select the missing tools using returned IDs and schema defaults. "
+                                "Do not invent results or retry an identical failed call.",
+                            },
+                        ]
+                    )
+                    continue
                 break
             messages.append(assistant_message)
             for call in calls[:8]:
@@ -265,6 +307,8 @@ class Orchestrator:
                 messages.append(
                     {"role": "tool", "tool_call_id": call.id, "content": item.model_dump_json()}
                 )
+            if required and required <= {e.tool for e in evidence if e.status == "ok"}:
+                break
         else:
             planner_errors.append(
                 "Tool-planning round limit reached; investigation may be incomplete."
@@ -274,6 +318,11 @@ class Orchestrator:
             self.settings.freshness_days,
             require_model=any(word in message.lower() for word in ("retrain", "best")),
         )
+        missing = required - {e.tool for e in evidence if e.status == "ok"}
+        if missing:
+            unknown.append(
+                "Required observations remain unavailable: " + ", ".join(sorted(missing))
+            )
         return AgentResponse(
             request_id=request_id,
             answer=render(evidence),

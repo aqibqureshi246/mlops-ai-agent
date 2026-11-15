@@ -18,7 +18,7 @@ def main():
         (
             "01-dataset-provenance",
             "Which datasets are tracked by DVC? Retrieve their current hash, Git commit, and changed-data status.",
-            {"dvc_dataset_version", "dvc_data_status"},
+            {"dvc_list_datasets", "dvc_dataset_version", "dvc_data_status"},
         ),
         (
             "02-model-selection",
@@ -50,6 +50,8 @@ def main():
                 "kubernetes_deployments",
                 "kubernetes_pods",
                 "airflow_dag_runs",
+                "dvc_dataset_version",
+                "dvc_data_status",
             },
         ),
     ]
@@ -57,11 +59,14 @@ def main():
     directory.mkdir(parents=True, exist_ok=True)
     failed = []
     for name, query, required in queries:
-        response = orchestrator.chat(query)
+        print(f"{name}: collecting required live observations", flush=True)
+        response = orchestrator.chat(query, required_tools=required)
         successful = {e.tool for e in response.evidence if e.status == "ok"}
         missing = sorted(required - successful)
         output = {
             "query": query,
+            "required_successful_tools": sorted(required),
+            "planner_model": settings.llm_model,
             "complete": not missing,
             "missing_required_evidence": missing,
             "response": response.model_dump(),
@@ -72,7 +77,9 @@ def main():
         (directory / f"{name}.json").write_text(
             json.dumps(output, indent=2) + "\n", encoding="utf-8"
         )
-        print(f"{name}: {'complete' if not missing else 'INCOMPLETE'}")
+        print(
+            f"{name}: {'complete' if not missing else 'INCOMPLETE'}; missing={missing}", flush=True
+        )
         if missing:
             failed.append(name)
     if failed:
