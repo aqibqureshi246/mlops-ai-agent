@@ -2,6 +2,10 @@ name: Live demonstration
 on:
   workflow_dispatch:
     inputs:
+      use_hosted_llm:
+        description: Use configured hosted LLM credentials instead of free local Ollama
+        type: boolean
+        default: false
       publish_evidence:
         description: Commit sanitized live evidence back to main after successful verification
         type: boolean
@@ -63,7 +67,7 @@ jobs:
           python scripts/export_cluster.py --api-url http://localhost:8000
       - name: Configure hosted LLM or local Ollama
         env:
-          HOSTED_LLM_KEY: ${{ secrets.LLM_API_KEY }}
+          HOSTED_LLM_KEY: ${{ inputs.use_hosted_llm && secrets.LLM_API_KEY || '' }}
           HOSTED_LLM_URL: ${{ vars.LLM_BASE_URL }}
           HOSTED_LLM_MODEL: ${{ vars.LLM_MODEL }}
         run: python scripts/configure_demo_llm.py

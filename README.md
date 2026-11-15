@@ -180,8 +180,9 @@ and captures the five conversations. It stops if required evidence is missing. A
 run it can commit sanitized evidence to main; this is controlled by the publish_evidence input.
 
 For a hosted model, add the LLM_API_KEY Actions secret and LLM_BASE_URL and LLM_MODEL repository
-variables. The key must remain in the secret store. Without a hosted key, the workflow tries the
-local Ollama model. Model quality, runner resources and external availability can affect a live run.
+variables and explicitly enable the use_hosted_llm workflow input. The key must remain in the secret
+store. The workflow defaults to free local Ollama even when a hosted key is configured. Model quality,
+runner resources and external availability can affect a live run.
 The workflow does not claim success until the observations are complete.
 
 ## Submission contents
