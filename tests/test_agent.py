@@ -7,7 +7,7 @@ import pytest
 from conftest import ScriptedPlanner
 
 from agent.config import Settings
-from agent.orchestrator import Orchestrator, assess
+from agent.orchestrator import Orchestrator, assess, planner_observation
 from agent.registry import Registry, Tool
 from agent.schemas import EmptyInput, Evidence
 
@@ -179,6 +179,32 @@ def test_observation_requirements_cannot_authorize_mutations():
             "Check health", required_tools={"inspect"}
         )
     handler.assert_not_called()
+
+
+def test_planner_comparison_is_compact_but_preserves_full_audit_evidence():
+    best = {
+        "run_id": "a" * 32,
+        "status": "FINISHED",
+        "metrics": {"f1_macro": 0.95},
+        "params": {"C": "3.0"},
+        "provenance": {"data.git_commit": "b" * 40, "data.pointer": "data/iris.csv.dvc"},
+    }
+    item = Evidence(
+        id="e1",
+        tool="mlflow_best_run",
+        status="ok",
+        request_id="r",
+        data={"comparison": [best], "best": best},
+    )
+    original = item.model_dump_json()
+    planned = json.loads(planner_observation(item))["data"]
+    assert planned["best"] == best
+    assert planned["comparison"][0] == {
+        "run_id": "a" * 32,
+        "status": "FINISHED",
+        "metrics": {"f1_macro": 0.95},
+    }
+    assert item.model_dump_json() == original
 
 
 def test_integration_correlates_all_four_services_without_retraining():

@@ -48,6 +48,7 @@ class OpenAIPlanner:
             messages=messages,
             tools=definitions,
             temperature=0,
+            max_tokens=1024,
             parallel_tool_calls=False,
         )
         message = response.choices[0].message
@@ -56,6 +57,21 @@ class OpenAIPlanner:
             for c in (message.tool_calls or [])
         ]
         return calls, message.model_dump(exclude_none=True)
+
+
+def planner_observation(item: Evidence) -> str:
+    """Keep full audit evidence while avoiding repeated model metadata in planner context."""
+    observation = item.model_dump(mode="json")
+    if item.status == "ok" and item.tool == "mlflow_best_run":
+        observation["data"]["comparison"] = [
+            {
+                key: run[key]
+                for key in ("run_id", "status", "start_time_ms", "metrics")
+                if key in run
+            }
+            for run in item.data.get("comparison", [])
+        ]
+    return json.dumps(observation, separators=(",", ":"))
 
 
 def assess(
@@ -259,9 +275,10 @@ class Orchestrator:
         for _ in range(self.settings.max_rounds):
             try:
                 calls, assistant_message = self.planner.next_calls(messages, definitions)
-            except Exception:
+            except Exception as exc:
                 planner_errors.append(
-                    "LLM planner unavailable or returned invalid structured arguments; no results were invented."
+                    "LLM planner unavailable or returned invalid structured arguments "
+                    f"({type(exc).__name__}); no results were invented."
                 )
                 break
             if not calls:
@@ -308,7 +325,7 @@ class Orchestrator:
                             pass
                 evidence.append(item)
                 messages.append(
-                    {"role": "tool", "tool_call_id": call.id, "content": item.model_dump_json()}
+                    {"role": "tool", "tool_call_id": call.id, "content": planner_observation(item)}
                 )
             if required and required <= {e.tool for e in evidence if e.status == "ok"}:
                 break

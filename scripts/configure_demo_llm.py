@@ -31,6 +31,7 @@ def main():
         set_key(env, "MLOPS_LLM_MODEL", model)
         set_key(env, "MLOPS_LLM_BASE_URL", "http://localhost:11434/v1")
         set_key(env, "MLOPS_LLM_API_KEY", "ollama")
+        set_key(env, "MLOPS_LLM_TIMEOUT", os.environ.get("LOCAL_LLM_TIMEOUT", "300"))
         print(f"Local tool-calling model ready: {model}.")
 
 
