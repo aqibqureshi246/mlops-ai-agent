@@ -148,7 +148,16 @@ class Registry:
             status, error = "denied", str(exc)
         except (TimeoutError, httpx.TimeoutException, subprocess.TimeoutExpired):
             status, error = "timeout", "Tool timed out; operational state is unknown."
-        except (ValueError, ValidationError):
+        except ValidationError as exc:
+            fields = [
+                {"field": ".".join(map(str, detail["loc"]))[:80], "issue": detail["type"]}
+                for detail in exc.errors(
+                    include_input=False, include_context=False, include_url=False
+                )[:5]
+            ]
+            status = "error"
+            error = self.scrub("Invalid tool input fields: " + json.dumps(fields))
+        except ValueError:
             status, error = "error", "Invalid tool input or invalid service response."
         except Exception as exc:
             # Never return exception messages: URLs, commands, and headers can contain secrets.

@@ -1,10 +1,10 @@
 {
-  "tests": 43,
+  "tests": 56,
   "failures": 0,
   "errors": 0,
   "skipped": 0,
-  "observed_at": "2026-11-14T19:07:18.312250+00:00",
-  "python": "3.12.9",
-  "platform": "Windows",
+  "observed_at": "2026-11-15T12:05:03.323007+00:00",
+  "python": "3.12.16",
+  "platform": "Linux",
   "scope": "Local tests with mocked external services and real temporary sklearn/MLflow checks"
 }

@@ -60,6 +60,7 @@ def test_dvc_rejects_traversal_and_revision_injection(tmp_path):
 
 def test_dvc_status_and_comparison_parse_structured_output(tmp_path, monkeypatch):
     tools = DvcTools(tmp_path)
+    monkeypatch.setattr(tools, "list_datasets", lambda: {"datasets": ["data/iris.csv.dvc"]})
     monkeypatch.setattr(tools, "_run", lambda *args: '{"data/iris.csv": "modified"}')
     assert tools.data_status()["changes"]["data/iris.csv"] == "modified"
     monkeypatch.setattr(tools, "_revision", lambda rev: rev)

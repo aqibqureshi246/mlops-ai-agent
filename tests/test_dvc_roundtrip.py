@@ -34,6 +34,15 @@ def test_real_dvc_remote_pull_restores_data_in_isolated_worktree(tmp_path):
     assert not (clone / "sample.csv").exists()
     run("dvc", "pull", "sample.csv.dvc", "-q", cwd=clone)
     assert (clone / "sample.csv").read_bytes() == b"feature,target\n1,0\n"
+    from agent.tools.dvc_tools import DvcTools
+
+    (source / "dvc.yaml").write_text(
+        "stages:\n  unused:\n    cmd: echo unused\n    outs:\n      - missing-pipeline-output.txt\n"
+    )
+    tools = DvcTools(source)
+    assert tools.data_status() == {"changes": {}}
+    (source / "sample.csv").write_bytes(b"feature,target\n2,0\n")
+    assert tools.data_status()["changes"]
 
 
 def test_bootstrap_with_existing_pointer_populates_the_remote(tmp_path, monkeypatch):

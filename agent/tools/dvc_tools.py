@@ -80,7 +80,9 @@ class DvcTools:
         }
 
     def data_status(self) -> dict:
-        return {"changes": json.loads(self._run("dvc", "status", "--json"))}
+        pointers = self.list_datasets()["datasets"]
+        changes = json.loads(self._run("dvc", "status", "--json", *pointers)) if pointers else {}
+        return {"changes": changes}
 
     def compare_versions(self, old_rev: str, new_rev: str = "HEAD") -> dict:
         old, new = self._revision(old_rev), self._revision(new_rev)

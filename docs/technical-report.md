@@ -40,18 +40,25 @@ ConfigMap, probes, resource requests/limits and restricted container security se
 
 ## Validation record
 
-Local verification completed with 43 passing tests and 85% statement coverage. Lint, formatting and Compose configuration checks passed. DVC versioning, local remote storage and isolated worktree recovery were exercised. Live Airflow, Kubernetes and LLM conversations remain pending because Docker Desktop is unavailable on the current approximately 4 GB host. The manual GitHub workflow is provided for complete live verification; hosted runs are currently awaiting runner availability. No unexecuted demonstration is represented as successful.
+[Live run 43711970736](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43711970736)
+verified isolated DVC reproduction, real Airflow training, both injected failures, successful recovery,
+two ready Kubernetes replicas, and a real setosa prediction at source revision
+02c11e9cc742fe834443fc672ab36351e12a5e64. The run reached its one-hour limit during local LLM
+collection. Three conversation exports are complete: model selection, pipeline status and deployment
+diagnosis. Dataset provenance and combined reasoning remain incomplete and are marked as such in
+their JSON exports. Full live verification is pending those two conversations; no final verification
+summary is published yet. The report and evidence will be updated after the corrected planner rerun.
 
 | Evidence | Expected export | Status |
 |---|---|---|
-| Automated tests | evidence/automated-tests.json | 43 passed locally; two dependency deprecation warnings |
+| Automated tests | evidence/automated-tests.json | 56 passed; 0 skipped; Python 3.12.16 on Linux |
 | Local dataset and remote | evidence/local-dvc.json | Hash matches; working and remote DVC status clean |
-| DVC reproduction | evidence/dvc-reproduction.json | Verified locally against published Git commit |
+| DVC reproduction | evidence/dvc-reproduction.json | Isolated checkout and retrieved byte hash verified |
 | Local training and prediction | evidence/local-model-verification.json | Actual macro F1 0.933333; quality gate passed; prediction verified |
-| Successful training and recovery | evidence/pipeline-none.json | Pending live execution |
-| Validation rejection | evidence/pipeline-validation.json | Pending live execution |
-| Quality-gate rejection | evidence/pipeline-quality.json | Pending live execution |
-| Kubernetes deployment | evidence/kubernetes-deployment.json | Pending live execution |
+| Successful training and recovery | evidence/pipeline-none.json | All five recovery tasks succeeded |
+| Validation rejection | evidence/pipeline-validation.json | Validator failed; all downstream tasks blocked |
+| Quality-gate rejection | evidence/pipeline-quality.json | Evaluation succeeded; final gate rejected the candidate |
+| Kubernetes deployment | evidence/kubernetes-deployment.json | Two ready replicas; actual prediction and provenance verified |
 | Five conversations | evidence/conversations/01 through 05 JSON files | Pending live execution |
 
 ## Five required conversations
@@ -86,8 +93,8 @@ succeed while the gate fails, quality.passed is false and no approved bundle exi
 Resolution: remove the injection, rerun and verify the gate and approved model provenance. Do not
 lower thresholds simply to pass a failing model. Actual logs belong in evidence/pipeline-quality.json.
 
-These are planned reproducible investigations until the corresponding real exports exist. Unit tests
-independently verify the failure boundaries using controlled fixtures.
+Both injected failure investigations were executed; their actual task states and root-cause logs
+are exported in evidence/. Unit tests independently verify the failure boundaries using fixtures.
 
 ## Limitations and improvements
 

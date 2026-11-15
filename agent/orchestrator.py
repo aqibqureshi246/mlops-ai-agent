@@ -20,6 +20,9 @@ Use schema defaults for the configured dataset pointer, DAG and namespace unless
 another valid value. Never substitute placeholder names or invented identifiers. Dataset byte hashes
 are not pointer paths. After selecting a model, call mlflow_run_details with the returned best.run_id.
 For changed-data questions, call dvc_data_status; a clean Git pointer alone does not establish this.
+Tools with an empty properties schema take exactly {}. In particular dvc_data_status and
+dvc_list_datasets take no path or revision arguments. Use only the tools currently advertised;
+completed observations are removed from an explicit observation contract.
 For training or restart requests: propose the relevant mutating tool. It will require a separate
 user confirmation. Never put a confirmation token into tool arguments.
 If a tool fails, state that it is unknown; do not retry indefinitely. Stop when enough evidence
@@ -72,6 +75,31 @@ def planner_observation(item: Evidence) -> str:
             for run in item.data.get("comparison", [])
         ]
     return json.dumps(observation, separators=(",", ":"))
+
+
+def observed_identifiers(evidence: list[Evidence]) -> dict:
+    """Expose literal reference values already returned by successful tools."""
+    identifiers = {}
+    for item in evidence:
+        if item.status != "ok":
+            continue
+        if item.tool == "mlflow_best_run" and item.data.get("best"):
+            best = item.data["best"]
+            if best.get("run_id"):
+                identifiers["selected_model_run_id"] = best["run_id"]
+            provenance = best.get("provenance", {})
+            for source, target in (
+                ("data.git_commit", "training_git_revision"),
+                ("data.pointer", "training_dataset_pointer"),
+            ):
+                if provenance.get(source):
+                    identifiers[target] = provenance[source]
+        if item.tool == "dvc_list_datasets" and len(item.data.get("datasets", [])) == 1:
+            identifiers["current_dataset_pointer"] = item.data["datasets"][0]
+        if item.tool == "airflow_dag_runs" and item.data.get("runs"):
+            if run_id := item.data["runs"][0].get("dag_run_id"):
+                identifiers["latest_airflow_run_id"] = run_id
+    return identifiers
 
 
 def assess(
@@ -267,12 +295,13 @@ class Orchestrator:
             )
         evidence, pending, planner_errors = [], [], []
         seen = set()
-        definitions = [
-            definition
-            for definition in self.registry.definitions()
-            if not required or definition["function"]["name"] in required
-        ]
         for _ in range(self.settings.max_rounds):
+            missing = required - {e.tool for e in evidence if e.status == "ok"}
+            definitions = [
+                definition
+                for definition in self.registry.definitions()
+                if not required or definition["function"]["name"] in missing
+            ]
             try:
                 calls, assistant_message = self.planner.next_calls(messages, definitions)
             except Exception as exc:
@@ -329,6 +358,20 @@ class Orchestrator:
                 )
             if required and required <= {e.tool for e in evidence if e.status == "ok"}:
                 break
+            if required:
+                missing = required - {e.tool for e in evidence if e.status == "ok"}
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": "Only these observations remain: "
+                        + ", ".join(sorted(missing))
+                        + ". Do not repeat completed calls. Literal identifiers from successful "
+                        "observations (copy their values exactly): "
+                        + json.dumps(observed_identifiers(evidence))
+                        + ". Tools without schema properties take {}. Choose the remaining tools "
+                        "and use only their declared argument names.",
+                    }
+                )
         else:
             planner_errors.append(
                 "Tool-planning round limit reached; investigation may be incomplete."

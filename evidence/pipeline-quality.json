@@ -1,0 +1,186 @@
+{
+  "run_id": "manual__agent_67214eb299434089bde6ec7c999694a0",
+  "injection": "quality",
+  "evidence": [
+    {
+      "id": "confirmation",
+      "tool": "airflow_trigger_training",
+      "status": "ok",
+      "observed_at": "2026-11-15T12:08:38.822910+00:00",
+      "data": {
+        "dag_id": "iris_training",
+        "run_id": "manual__agent_67214eb299434089bde6ec7c999694a0",
+        "state": "queued",
+        "note": "Submission acknowledged; inspect task statuses until a terminal state."
+      },
+      "error": null,
+      "request_id": "9c0615c6461641d591f3819714a341f3"
+    },
+    {
+      "id": "tool",
+      "tool": "airflow_task_instances",
+      "status": "ok",
+      "observed_at": "2026-11-15T12:09:18.265283+00:00",
+      "data": {
+        "dag_id": "iris_training",
+        "run_id": "manual__agent_67214eb299434089bde6ec7c999694a0",
+        "tasks": [
+          {
+            "task_id": "validate",
+            "state": "success",
+            "try_number": 1,
+            "start_date": "2026-11-15T12:08:39.864970Z",
+            "end_date": "2026-11-15T12:08:42.838330Z"
+          },
+          {
+            "task_id": "preprocess",
+            "state": "success",
+            "try_number": 1,
+            "start_date": "2026-11-15T12:08:43.020935Z",
+            "end_date": "2026-11-15T12:08:45.960992Z"
+          },
+          {
+            "task_id": "train",
+            "state": "success",
+            "try_number": 1,
+            "start_date": "2026-11-15T12:08:51.029778Z",
+            "end_date": "2026-11-15T12:08:54.079041Z"
+          },
+          {
+            "task_id": "evaluate_mlflow",
+            "state": "success",
+            "try_number": 1,
+            "start_date": "2026-11-15T12:08:54.985027Z",
+            "end_date": "2026-11-15T12:08:58.248715Z"
+          },
+          {
+            "task_id": "quality_gate",
+            "state": "failed",
+            "try_number": 2,
+            "start_date": "2026-11-15T12:09:12.169819Z",
+            "end_date": "2026-11-15T12:09:15.268887Z"
+          }
+        ],
+        "failed_tasks": [
+          {
+            "task_id": "quality_gate",
+            "state": "failed",
+            "try_number": 2,
+            "start_date": "2026-11-15T12:09:12.169819Z",
+            "end_date": "2026-11-15T12:09:15.268887Z"
+          }
+        ]
+      },
+      "error": null,
+      "request_id": "9c0615c6461641d591f3819714a341f3"
+    },
+    {
+      "id": "tool",
+      "tool": "airflow_task_logs",
+      "status": "ok",
+      "observed_at": "2026-11-15T12:09:18.283462+00:00",
+      "data": {
+        "dag_id": "iris_training",
+        "run_id": "manual__agent_67214eb299434089bde6ec7c999694a0",
+        "task_id": "quality_gate",
+        "logs": {
+          "content": [
+            {
+              "event": "::group::Log message source details",
+              "sources": [
+                "/opt/airflow/logs/dag_id=iris_training/run_id=manual__agent_67214eb299434089bde6ec7c999694a0/task_id=quality_gate/attempt=2.log"
+              ]
+            },
+            {
+              "event": "::endgroup::"
+            },
+            {
+              "timestamp": "2026-11-15T12:09:12.258167Z",
+              "event": "DAG bundles loaded: dags-folder",
+              "level": "info",
+              "logger": "airflow.dag_processing.bundles.manager.DagBundlesManager"
+            },
+            {
+              "timestamp": "2026-11-15T12:09:12.258993Z",
+              "event": "Filling up the DagBag from /opt/project/dags/training_pipeline.py",
+              "level": "info",
+              "logger": "airflow.models.dagbag.DagBag"
+            },
+            {
+              "timestamp": "2026-11-15T12:09:15.235367Z",
+              "event": "Task failed with exception",
+              "level": "error",
+              "logger": "task",
+              "error_detail": [
+                {
+                  "exc_type": "ValueError",
+                  "exc_value": "Quality gate rejected candidate: F1=0.9333, threshold=0.9; injected=True",
+                  "exc_notes": [],
+                  "syntax_error": null,
+                  "is_cause": false,
+                  "frames": [
+                    {
+                      "filename": "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py",
+                      "lineno": 838,
+                      "name": "run"
+                    },
+                    {
+                      "filename": "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/task_runner.py",
+                      "lineno": 1130,
+                      "name": "_execute_task"
+                    },
+                    {
+                      "filename": "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py",
+                      "lineno": 408,
+                      "name": "wrapper"
+                    },
+                    {
+                      "filename": "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/decorator.py",
+                      "lineno": 251,
+                      "name": "execute"
+                    },
+                    {
+                      "filename": "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/bases/operator.py",
+                      "lineno": 408,
+                      "name": "wrapper"
+                    },
+                    {
+                      "filename": "/home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py",
+                      "lineno": 212,
+                      "name": "execute"
+                    },
+                    {
+                      "filename": "/home/airflow/.local/lib/python3.12/site-packages/airflow/providers/standard/operators/python.py",
+                      "lineno": 235,
+                      "name": "execute_callable"
+                    },
+                    {
+                      "filename": "/home/airflow/.local/lib/python3.12/site-packages/airflow/sdk/execution_time/callback_runner.py",
+                      "lineno": 81,
+                      "name": "run"
+                    },
+                    {
+                      "filename": "/opt/project/dags/training_pipeline.py",
+                      "lineno": 51,
+                      "name": "quality_gate"
+                    },
+                    {
+                      "filename": "/opt/project/training/train.py",
+                      "lineno": 181,
+                      "name": "quality_gate"
+                    }
+                  ],
+                  "is_group": false,
+                  "exceptions": []
+                }
+              ]
+            }
+          ],
+          "continuation_token": "[REDACTED]"
+        }
+      },
+      "error": null,
+      "request_id": "9c0615c6461641d591f3819714a341f3"
+    }
+  ]
+}

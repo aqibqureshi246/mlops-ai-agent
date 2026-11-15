@@ -1,0 +1,280 @@
+{
+  "query": "Check whether the prediction API is available in mlops. Inspect pods, deployment, services and events. Explain any unhealthy pods and restart events using evidence.",
+  "required_successful_tools": [
+    "kubernetes_deployments",
+    "kubernetes_events",
+    "kubernetes_pods",
+    "kubernetes_services"
+  ],
+  "planner_model": "qwen2.5:7b",
+  "complete": true,
+  "missing_required_evidence": [],
+  "response": {
+    "request_id": "a4d6a3a88b624e4aaa39baa72e840e89",
+    "answer": "[e1] kubernetes_deployments: prediction-api: 2/2 ready replicas, images=['mlops-prediction:878826d96e14'], deployed run=878826d96e144a08ae7e8c2fdeb0a21e\n[e2] kubernetes_events: {\"events\": [{\"count\": 1, \"message\": \"Successfully assigned mlops/prediction-api-7bfdb9c48d-9szhh to mlops-a3-control-plane\", \"object\": \"prediction-api-7bfdb9c48d-9szhh\", \"reason\": \"Scheduled\", \"type\": \"Normal\"}, {\"count\": 1, \"message\": \"Container image \\\"mlops-prediction:878826d96e14\\\" already present on machine\", \"object\": \"prediction-api-7bfdb9c48d-9szhh\", \"reason\": \"Pulled\", \"type\": \"Normal\"}, {\"count\": 1, \"message\": \"Created container: prediction-api\", \"object\": \"prediction-api-7bfdb9c48d-9szhh\", \"reason\": \"Created\", \"type\": \"Normal\"}, {\"count\": 1, \"message\": \"Started container prediction-api\", \"object\": \"prediction-api-7bfdb9c48d-9szhh\", \"reason\": \"Started\", \"type\": \"Normal\"}, {\"count\": 1, \"message\": \"Startup probe failed: Get \\\"http://10.244.0.6:8000/health/live\\\": dial tcp 10.244.0.6:8000: connect: connection refused\", \"object\": \"prediction-api-7bfdb9c48d-9szhh\", \"reason\": \"Unhealthy\", \"type\": \"Warning\"}, {\"count\": 1, \"message\": \"Successfully assigned mlops/prediction-api-7bfdb9c48d-xcj6z to mlops-a3-control-plane\", \"object\": \"prediction-api-7bfdb9c48d-xcj6z\", \"reason\": \"Scheduled\", \"type\": \"Normal\"}, {\"count\": 1, \"message\": \"Container image \\\"mlops-prediction:878826d96e14\\\" already present on machine\", \"object\": \"prediction-api-7bfdb9c48d-xcj6z\", \"reason\": \"Pulled\", \"type\": \"Normal\"}, {\"count\": 1, \"message\": \"Created container: prediction-api\", \"object\": \"prediction-api-7bfdb9c48d-xcj6z\", \"reason\": \"Created\", \"type\": \"Normal\"}, {\"count\": 1, \"message\": \"Started container prediction-api\", \"object\": \"prediction-api-7bfdb9c48d-xcj6z\", \"reason\": \"Started\", \"type\": \"Normal\"}, {\"count\": 1, \"message\": \"Startup probe failed: Get \\\"http://10.244.0.5:8000/health/live\\\": dial tcp 10.244.0.5:8000: connect: connection refused\", \"object\": \"prediction-api-7bfdb9c48d-xcj6z\", \"reason\": \"Unhealthy\", \"type\": \"Warning\"}, {\"count\": 1, \"message\": \"Created pod: prediction-api-7bfdb9c48d-xcj6z\", \"object\": \"prediction-api-7bfdb9c48d\", \"reason\": \"SuccessfulCreate\", \"type\": \"Normal\"}, {\"count\": 1, \"message\": \"Created pod: prediction-api-7bfdb9c48d-9szhh\", \"object\": \"prediction-api-7bfdb9c48d\", \"reason\": \"SuccessfulCreate\", \"type\": \"Normal\"}, {\"count\": 1, \"message\": \"Scaled up replica set prediction-api-7bfdb9c48d from 0 to 2\", \"object\": \"prediction-api\", \"reason\": \"ScalingReplicaSet\", \"type\": \"Normal\"}]}\n[e3] kubernetes_pods: prediction-api-7bfdb9c48d-9szhh: phase=Running, Ready=True, restarts=0; prediction-api-7bfdb9c48d-xcj6z: phase=Running, Ready=True, restarts=0\n[e4] kubernetes_services: {\"namespace\": \"mlops\", \"services\": [{\"cluster_ip\": \"10.96.51.165\", \"name\": \"prediction-api\", \"ports\": [{\"port\": 80, \"target_port\": \"http\"}], \"type\": \"ClusterIP\"}]}",
+    "evidence": [
+      {
+        "id": "e1",
+        "tool": "kubernetes_deployments",
+        "status": "ok",
+        "observed_at": "2026-11-15T12:35:41.636895+00:00",
+        "data": {
+          "namespace": "mlops",
+          "deployments": [
+            {
+              "name": "prediction-api",
+              "desired": 2,
+              "ready": 2,
+              "available": 2,
+              "generation": 1,
+              "observed_generation": 1,
+              "images": [
+                "mlops-prediction:878826d96e14"
+              ],
+              "model_run_id": "878826d96e144a08ae7e8c2fdeb0a21e",
+              "conditions": [
+                {
+                  "type": "Available",
+                  "status": "True",
+                  "reason": "MinimumReplicasAvailable"
+                },
+                {
+                  "type": "Progressing",
+                  "status": "True",
+                  "reason": "NewReplicaSetAvailable"
+                }
+              ]
+            }
+          ]
+        },
+        "error": null,
+        "request_id": "a4d6a3a88b624e4aaa39baa72e840e89"
+      },
+      {
+        "id": "e2",
+        "tool": "kubernetes_events",
+        "status": "ok",
+        "observed_at": "2026-11-15T12:35:41.648558+00:00",
+        "data": {
+          "events": [
+            {
+              "object": "prediction-api-7bfdb9c48d-9szhh",
+              "reason": "Scheduled",
+              "message": "Successfully assigned mlops/prediction-api-7bfdb9c48d-9szhh to mlops-a3-control-plane",
+              "count": 1,
+              "type": "Normal"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d-9szhh",
+              "reason": "Pulled",
+              "message": "Container image \"mlops-prediction:878826d96e14\" already present on machine",
+              "count": 1,
+              "type": "Normal"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d-9szhh",
+              "reason": "Created",
+              "message": "Created container: prediction-api",
+              "count": 1,
+              "type": "Normal"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d-9szhh",
+              "reason": "Started",
+              "message": "Started container prediction-api",
+              "count": 1,
+              "type": "Normal"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d-9szhh",
+              "reason": "Unhealthy",
+              "message": "Startup probe failed: Get \"http://10.244.0.6:8000/health/live\": dial tcp 10.244.0.6:8000: connect: connection refused",
+              "count": 1,
+              "type": "Warning"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d-xcj6z",
+              "reason": "Scheduled",
+              "message": "Successfully assigned mlops/prediction-api-7bfdb9c48d-xcj6z to mlops-a3-control-plane",
+              "count": 1,
+              "type": "Normal"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d-xcj6z",
+              "reason": "Pulled",
+              "message": "Container image \"mlops-prediction:878826d96e14\" already present on machine",
+              "count": 1,
+              "type": "Normal"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d-xcj6z",
+              "reason": "Created",
+              "message": "Created container: prediction-api",
+              "count": 1,
+              "type": "Normal"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d-xcj6z",
+              "reason": "Started",
+              "message": "Started container prediction-api",
+              "count": 1,
+              "type": "Normal"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d-xcj6z",
+              "reason": "Unhealthy",
+              "message": "Startup probe failed: Get \"http://10.244.0.5:8000/health/live\": dial tcp 10.244.0.5:8000: connect: connection refused",
+              "count": 1,
+              "type": "Warning"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d",
+              "reason": "SuccessfulCreate",
+              "message": "Created pod: prediction-api-7bfdb9c48d-xcj6z",
+              "count": 1,
+              "type": "Normal"
+            },
+            {
+              "object": "prediction-api-7bfdb9c48d",
+              "reason": "SuccessfulCreate",
+              "message": "Created pod: prediction-api-7bfdb9c48d-9szhh",
+              "count": 1,
+              "type": "Normal"
+            },
+            {
+              "object": "prediction-api",
+              "reason": "ScalingReplicaSet",
+              "message": "Scaled up replica set prediction-api-7bfdb9c48d from 0 to 2",
+              "count": 1,
+              "type": "Normal"
+            }
+          ]
+        },
+        "error": null,
+        "request_id": "a4d6a3a88b624e4aaa39baa72e840e89"
+      },
+      {
+        "id": "e3",
+        "tool": "kubernetes_pods",
+        "status": "ok",
+        "observed_at": "2026-11-15T12:35:41.660430+00:00",
+        "data": {
+          "namespace": "mlops",
+          "pods": [
+            {
+              "name": "prediction-api-7bfdb9c48d-9szhh",
+              "phase": "Running",
+              "conditions": [
+                {
+                  "type": "PodReadyToStartContainers",
+                  "status": "True",
+                  "reason": null
+                },
+                {
+                  "type": "Initialized",
+                  "status": "True",
+                  "reason": null
+                },
+                {
+                  "type": "Ready",
+                  "status": "True",
+                  "reason": null
+                },
+                {
+                  "type": "ContainersReady",
+                  "status": "True",
+                  "reason": null
+                },
+                {
+                  "type": "PodScheduled",
+                  "status": "True",
+                  "reason": null
+                }
+              ],
+              "containers": [
+                {
+                  "name": "prediction-api",
+                  "ready": true,
+                  "restarts": 0,
+                  "waiting_reason": null,
+                  "last_exit_code": null
+                }
+              ]
+            },
+            {
+              "name": "prediction-api-7bfdb9c48d-xcj6z",
+              "phase": "Running",
+              "conditions": [
+                {
+                  "type": "PodReadyToStartContainers",
+                  "status": "True",
+                  "reason": null
+                },
+                {
+                  "type": "Initialized",
+                  "status": "True",
+                  "reason": null
+                },
+                {
+                  "type": "Ready",
+                  "status": "True",
+                  "reason": null
+                },
+                {
+                  "type": "ContainersReady",
+                  "status": "True",
+                  "reason": null
+                },
+                {
+                  "type": "PodScheduled",
+                  "status": "True",
+                  "reason": null
+                }
+              ],
+              "containers": [
+                {
+                  "name": "prediction-api",
+                  "ready": true,
+                  "restarts": 0,
+                  "waiting_reason": null,
+                  "last_exit_code": null
+                }
+              ]
+            }
+          ]
+        },
+        "error": null,
+        "request_id": "a4d6a3a88b624e4aaa39baa72e840e89"
+      },
+      {
+        "id": "e4",
+        "tool": "kubernetes_services",
+        "status": "ok",
+        "observed_at": "2026-11-15T12:35:41.664969+00:00",
+        "data": {
+          "namespace": "mlops",
+          "services": [
+            {
+              "name": "prediction-api",
+              "type": "ClusterIP",
+              "cluster_ip": "10.96.51.165",
+              "ports": [
+                {
+                  "port": 80,
+                  "target_port": "http"
+                }
+              ]
+            }
+          ]
+        },
+        "error": null,
+        "request_id": "a4d6a3a88b624e4aaa39baa72e840e89"
+      }
+    ],
+    "uncertainties": [],
+    "recommendations": [
+      "No retraining is automatically initiated. Freshness policy and quality checks do not establish live model degradation; no live drift monitor is configured."
+    ],
+    "pending_actions": []
+  }
+}

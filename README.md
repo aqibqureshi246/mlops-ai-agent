@@ -181,7 +181,7 @@ run it can commit sanitized evidence to main; this is controlled by the publish_
 
 For a hosted model, add the LLM_API_KEY Actions secret and LLM_BASE_URL and LLM_MODEL repository
 variables and explicitly enable the use_hosted_llm workflow input. The key must remain in the secret
-store. The workflow defaults to free local Ollama with qwen2.5:7b even when a hosted key is configured. Model quality,
+store. The workflow defaults to free local Ollama with qwen2.5:3b even when a hosted key is configured. Model quality,
 runner resources and external availability can affect a live run.
 The workflow does not claim success until the observations are complete.
 

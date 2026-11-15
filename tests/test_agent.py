@@ -7,7 +7,7 @@ import pytest
 from conftest import ScriptedPlanner
 
 from agent.config import Settings
-from agent.orchestrator import Orchestrator, assess, planner_observation
+from agent.orchestrator import Orchestrator, assess, observed_identifiers, planner_observation
 from agent.registry import Registry, Tool
 from agent.schemas import EmptyInput, Evidence
 
@@ -170,6 +170,54 @@ def test_explicit_observation_contract_limits_the_models_available_tools():
     assert {d["function"]["name"] for d in definitions} == {"inspect"}
     assert result.evidence[0].data == {"replicas": 2}
     handler.assert_called_once_with()
+
+
+def test_completed_required_tools_are_removed_from_subsequent_planning_rounds():
+    registry = registry_with(lambda: {"count": 1})
+    registry.add(Tool("second", "Second observation", EmptyInput, lambda: {"count": 2}))
+    planner = Mock(wraps=ScriptedPlanner([("inspect", {})], [("second", {})]))
+    result = Orchestrator(registry, planner, Settings()).chat(
+        "Inspect both", required_tools={"inspect", "second"}
+    )
+    second_definitions = planner.next_calls.call_args_list[1].args[1]
+    assert [d["function"]["name"] for d in second_definitions] == ["second"]
+    assert [e.tool for e in result.evidence] == ["inspect", "second"]
+
+
+def test_identifier_hints_only_use_successful_observed_values():
+    success = Evidence(
+        id="e1",
+        tool="mlflow_best_run",
+        status="ok",
+        request_id="r",
+        data={
+            "best": {
+                "run_id": "a" * 32,
+                "provenance": {"data.git_commit": "b" * 40, "data.pointer": "data/iris.csv.dvc"},
+            }
+        },
+    )
+    failed = Evidence(
+        id="e2",
+        tool="airflow_dag_runs",
+        status="error",
+        request_id="r",
+        data={"runs": [{"dag_run_id": "unverified"}]},
+    )
+    assert observed_identifiers([success, failed]) == {
+        "selected_model_run_id": "a" * 32,
+        "training_git_revision": "b" * 40,
+        "training_dataset_pointer": "data/iris.csv.dvc",
+    }
+
+
+def test_validation_feedback_identifies_fields_without_exposing_argument_values():
+    handler = Mock()
+    result = registry_with(handler).execute("inspect", {"path": "private-value-never-echo"}, "r")
+    assert result.status == "error"
+    assert "path" in result.error and "extra_forbidden" in result.error
+    assert "private-value-never-echo" not in result.model_dump_json()
+    handler.assert_not_called()
 
 
 def test_observation_requirements_cannot_authorize_mutations():

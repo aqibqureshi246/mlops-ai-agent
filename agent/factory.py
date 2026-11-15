@@ -100,7 +100,7 @@ def build_registry(settings: Settings) -> Registry:
         ),
         (
             "dvc_data_status",
-            "Detect changed or missing tracked data using DVC status.",
+            "Detect changed or missing tracked data using DVC status. Takes no arguments; use {}.",
             EmptyInput,
             dvc.data_status,
         ),
