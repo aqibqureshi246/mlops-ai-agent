@@ -53,6 +53,31 @@ def test_quality_gate_failure_blocks_approved_bundle(trained, monkeypatch):
     client.set_tag.assert_any_call("a" * 32, "quality.passed", "false")
 
 
+def test_quality_gate_resolves_remote_artifacts_after_task_process_reset(trained, monkeypatch):
+    from mlflow.store.artifact.mlflow_artifacts_repo import MlflowArtifactsRepository
+
+    original = stages.mlflow.get_tracking_uri()
+    resolved = []
+    client = Mock()
+
+    def upload(run_id, path):
+        repository = MlflowArtifactsRepository(f"mlflow-artifacts:/1/{run_id}/artifacts")
+        resolved.append(repository.artifact_uri)
+
+    client.log_artifact.side_effect = upload
+    monkeypatch.setattr(stages.mlflow, "MlflowClient", lambda **kwargs: client)
+    stages.dump(trained / "evaluation.json", {"run_id": "a" * 32, "metrics": {"f1_macro": 0.95}})
+    try:
+        stages.mlflow.set_tracking_uri((trained / "unrelated-local-tracking").as_uri())
+        stages.quality_gate(trained, "http://mlflow:5000")
+        assert resolved == [
+            "http://mlflow:5000/api/2.0/mlflow-artifacts/artifacts/1/" + "a" * 32 + "/artifacts"
+        ]
+        assert (trained / "approved/metadata.json").exists()
+    finally:
+        stages.mlflow.set_tracking_uri(original)
+
+
 def test_approved_model_predicts_and_reports_provenance(trained, monkeypatch):
     monkeypatch.setattr(stages.mlflow, "MlflowClient", lambda **kwargs: Mock())
     stages.dump(trained / "evaluation.json", {"run_id": "a" * 32, "metrics": {"f1_macro": 0.95}})

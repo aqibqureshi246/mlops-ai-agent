@@ -170,6 +170,8 @@ def quality_gate(
         shutil.rmtree(approved)
     result = load(work / "evaluation.json")
     passed = result["metrics"]["f1_macro"] >= threshold and inject_failure != "quality"
+    # Each Airflow task is a fresh process; proxied artifact URIs use this global setting.
+    mlflow.set_tracking_uri(tracking_uri)
     client = mlflow.MlflowClient(tracking_uri=tracking_uri)
     client.set_tag(result["run_id"], "quality.passed", str(passed).lower())
     client.set_tag(result["run_id"], "quality.threshold", str(threshold))
