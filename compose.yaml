@@ -41,6 +41,7 @@ services:
       AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /run/airflow-passwords.json
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:${MLOPS_POSTGRES_PASSWORD}@postgres/airflow
       AIRFLOW__API_AUTH__JWT_SECRET: ${MLOPS_AIRFLOW_JWT_SECRET:?Run setup_local.py}
+      AIRFLOW__API_AUTH__JWT_ISSUER: mlops-a3
       AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://localhost:8080/execution/
       GIT_OPTIONAL_LOCKS: "0"
       PYTHONPATH: /opt/project
