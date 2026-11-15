@@ -40,18 +40,11 @@ ConfigMap, probes, resource requests/limits and restricted container security se
 
 ## Validation record
 
-[Live run 43711970736](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43711970736)
-verified isolated DVC reproduction, real Airflow training, both injected failures, successful recovery,
-two ready Kubernetes replicas, and a real setosa prediction at source revision
-02c11e9cc742fe834443fc672ab36351e12a5e64. The run reached its one-hour limit during local LLM
-collection. Three conversation exports are complete: model selection, pipeline status and deployment
-diagnosis. Dataset provenance and combined reasoning remain incomplete and are marked as such in
-their JSON exports. Full live verification is pending those two conversations; no final verification
-summary is published yet. The report and evidence will be updated after the corrected planner rerun.
+The live workflow verified the observations below. Actual run IDs, source revision and verification time are recorded at the end of this report.
 
 | Evidence | Expected export | Status |
 |---|---|---|
-| Automated tests | evidence/automated-tests.json | 56 passed; 0 skipped; Python 3.12.16 on Linux |
+| Automated tests | evidence/automated-tests.json | 59 passed; 0 skipped; Python 3.12.16 on Linux |
 | Local dataset and remote | evidence/local-dvc.json | Hash matches; working and remote DVC status clean |
 | DVC reproduction | evidence/dvc-reproduction.json | Isolated checkout and retrieved byte hash verified |
 | Local training and prediction | evidence/local-model-verification.json | Actual macro F1 0.933333; quality gate passed; prediction verified |
@@ -59,7 +52,7 @@ summary is published yet. The report and evidence will be updated after the corr
 | Validation rejection | evidence/pipeline-validation.json | Validator failed; all downstream tasks blocked |
 | Quality-gate rejection | evidence/pipeline-quality.json | Evaluation succeeded; final gate rejected the candidate |
 | Kubernetes deployment | evidence/kubernetes-deployment.json | Two ready replicas; actual prediction and provenance verified |
-| Five conversations | evidence/conversations/01 through 05 JSON files | Pending live execution |
+| Five conversations | evidence/conversations/01 through 05 JSON files | Verified; see exported evidence |
 
 ## Five required conversations
 
@@ -80,18 +73,18 @@ missing. An illustrative transcript or mocked CI result does not count as live d
 ### Validation rejection
 
 Injection: trigger iris_training with inject_failure=validation. The validator raises a missing-feature
-error before preprocessing. Expected diagnosis: validate fails after its retry; dependent tasks are
+error before preprocessing. Verified outcome: validate fails after its retry; dependent tasks are
 upstream_failed, and no approved model is published. Inspect the task log to establish root cause.
 Resolution: submit a valid configuration and complete a real recovery run. Actual observations and
-run IDs belong in evidence/pipeline-validation.json and the recovery export.
+run IDs are recorded in evidence/pipeline-validation.json and the recovery export.
 
 ### Quality-gate rejection
 
 Injection: trigger iris_training with inject_failure=quality. Evaluation records its measured metrics,
-but the final gate explicitly rejects promotion. Expected diagnosis: training and evaluation can
+but the final gate explicitly rejects promotion. Verified outcome: training and evaluation can
 succeed while the gate fails, quality.passed is false and no approved bundle exists for that run.
 Resolution: remove the injection, rerun and verify the gate and approved model provenance. Do not
-lower thresholds simply to pass a failing model. Actual logs belong in evidence/pipeline-quality.json.
+lower thresholds simply to pass a failing model. Actual logs are recorded in evidence/pipeline-quality.json.
 
 Both injected failure investigations were executed; their actual task states and root-cause logs
 are exported in evidence/. Unit tests independently verify the failure boundaries using fixtures.
@@ -112,8 +105,24 @@ grow. Direct dependencies are pinned and a complete cross-platform dependency lo
 
 ## Unexpected failure resolved during verification
 
-DVC 3.59.2 failed with an import of the removed private pathspec symbol _DIR_MARK when resolved against pathspec 1.1.1. The dependency is now explicitly pinned to pathspec 0.12.1 in the project and cross-platform lock. Actual dvc add, local remote push, pipeline-graph validation and an isolated worktree remote-pull test subsequently passed. This is an observed dependency failure, distinct from the two planned deliberately injected Airflow failures above.
+DVC 3.59.2 failed with an import of the removed private pathspec symbol _DIR_MARK when resolved against pathspec 1.1.1. The dependency is now explicitly pinned to pathspec 0.12.1 in the project and cross-platform lock. Actual dvc add, local remote push, pipeline-graph validation and an isolated worktree remote-pull test subsequently passed. This is an observed dependency failure, distinct from the two deliberately injected Airflow failures above.
 
 ## Published-source local verification
 
-The dataset was retrieved into an isolated worktree at commit 98dce180f083d5e64502fb3e5510c1797909a22e and its byte hash matched the DVC pointer. A real local file-backed MLflow training run recorded accuracy 0.9333333333 and macro F1 0.9333333333. Its 0.90 quality gate passed, and the approved bundle returned a successful readiness check, matching application provenance and a setosa prediction through FastAPI TestClient. The exported scope explicitly distinguishes these local checks from pending real Airflow, Kubernetes and LLM demonstrations.
+The dataset was retrieved into an isolated worktree at commit 98dce180f083d5e64502fb3e5510c1797909a22e and its byte hash matched the DVC pointer. A real local file-backed MLflow training run recorded accuracy 0.9333333333 and macro F1 0.9333333333. Its 0.90 quality gate passed, and the approved bundle returned a successful readiness check, matching application provenance and a setosa prediction through FastAPI TestClient. The exported scope explicitly distinguishes these local checks from the separate real Airflow, Kubernetes and LLM demonstration exports.
+
+## Verified live execution record
+
+- verified_at: 2026-11-15T15:20:28.943657+00:00
+- recovery_run: manual__agent_c1943827aa264a279ed2d833d8c1ec01
+- validation_failure_run: manual__agent_03911bfcbe8646e4b33d511d32391e9f
+- quality_failure_run: manual__agent_1ba55e0bddd442e48a0d2944ed9d0084
+- dataset_hash: 4224576f0267bf88902f87f0f6200967
+- complete_conversations: 5
+- tests_passed: 59
+- test_python: 3.12.16
+- test_platform: Linux
+- workflow_url: https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43727102101
+- source_commit: 64673783c3e301569b7d04665dccc6afee1755a6
+
+All five recovery tasks succeeded. The validation failure log identified the injected missing-feature error; the quality failure log identified the explicit gate rejection. Both were followed by a successful recovery run. Historical data bytes were retrieved and verified, and the deployment/inference observations are exported in evidence/.

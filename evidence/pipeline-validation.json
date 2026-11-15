@@ -1,64 +1,64 @@
 {
-  "run_id": "manual__agent_9ab1c57b0dee4d5c9367ca40037aa76f",
+  "run_id": "manual__agent_03911bfcbe8646e4b33d511d32391e9f",
   "injection": "validation",
   "evidence": [
     {
       "id": "confirmation",
       "tool": "airflow_trigger_training",
       "status": "ok",
-      "observed_at": "2026-11-15T12:08:14.416601+00:00",
+      "observed_at": "2026-11-15T15:00:25.117893+00:00",
       "data": {
         "dag_id": "iris_training",
-        "run_id": "manual__agent_9ab1c57b0dee4d5c9367ca40037aa76f",
+        "run_id": "manual__agent_03911bfcbe8646e4b33d511d32391e9f",
         "state": "queued",
         "note": "Submission acknowledged; inspect task statuses until a terminal state."
       },
       "error": null,
-      "request_id": "b7e8eeb7224f4bb180b80df5bba6bcce"
+      "request_id": "305a6f716706454c81a94398fec64e73"
     },
     {
       "id": "tool",
       "tool": "airflow_task_instances",
       "status": "ok",
-      "observed_at": "2026-11-15T12:08:35.651862+00:00",
+      "observed_at": "2026-11-15T15:00:49.335664+00:00",
       "data": {
         "dag_id": "iris_training",
-        "run_id": "manual__agent_9ab1c57b0dee4d5c9367ca40037aa76f",
+        "run_id": "manual__agent_03911bfcbe8646e4b33d511d32391e9f",
         "tasks": [
           {
             "task_id": "preprocess",
             "state": "upstream_failed",
             "try_number": 0,
-            "start_date": "2026-11-15T12:08:31.806852Z",
-            "end_date": "2026-11-15T12:08:31.806852Z"
+            "start_date": "2026-11-15T15:00:43.558548Z",
+            "end_date": "2026-11-15T15:00:43.558548Z"
           },
           {
             "task_id": "train",
             "state": "upstream_failed",
             "try_number": 0,
-            "start_date": "2026-11-15T12:08:32.850038Z",
-            "end_date": "2026-11-15T12:08:32.850038Z"
+            "start_date": "2026-11-15T15:00:44.590311Z",
+            "end_date": "2026-11-15T15:00:44.590311Z"
           },
           {
             "task_id": "evaluate_mlflow",
             "state": "upstream_failed",
             "try_number": 0,
-            "start_date": "2026-11-15T12:08:33.161025Z",
-            "end_date": "2026-11-15T12:08:33.161025Z"
+            "start_date": "2026-11-15T15:00:45.619999Z",
+            "end_date": "2026-11-15T15:00:45.619999Z"
           },
           {
             "task_id": "quality_gate",
             "state": "upstream_failed",
             "try_number": 0,
-            "start_date": "2026-11-15T12:08:33.737022Z",
-            "end_date": "2026-11-15T12:08:33.737022Z"
+            "start_date": "2026-11-15T15:00:46.647062Z",
+            "end_date": "2026-11-15T15:00:46.647062Z"
           },
           {
             "task_id": "validate",
             "state": "failed",
             "try_number": 2,
-            "start_date": "2026-11-15T12:08:27.922540Z",
-            "end_date": "2026-11-15T12:08:30.882129Z"
+            "start_date": "2026-11-15T15:00:40.627438Z",
+            "end_date": "2026-11-15T15:00:43.200212Z"
           }
         ],
         "failed_tasks": [
@@ -66,76 +66,76 @@
             "task_id": "preprocess",
             "state": "upstream_failed",
             "try_number": 0,
-            "start_date": "2026-11-15T12:08:31.806852Z",
-            "end_date": "2026-11-15T12:08:31.806852Z"
+            "start_date": "2026-11-15T15:00:43.558548Z",
+            "end_date": "2026-11-15T15:00:43.558548Z"
           },
           {
             "task_id": "train",
             "state": "upstream_failed",
             "try_number": 0,
-            "start_date": "2026-11-15T12:08:32.850038Z",
-            "end_date": "2026-11-15T12:08:32.850038Z"
+            "start_date": "2026-11-15T15:00:44.590311Z",
+            "end_date": "2026-11-15T15:00:44.590311Z"
           },
           {
             "task_id": "evaluate_mlflow",
             "state": "upstream_failed",
             "try_number": 0,
-            "start_date": "2026-11-15T12:08:33.161025Z",
-            "end_date": "2026-11-15T12:08:33.161025Z"
+            "start_date": "2026-11-15T15:00:45.619999Z",
+            "end_date": "2026-11-15T15:00:45.619999Z"
           },
           {
             "task_id": "quality_gate",
             "state": "upstream_failed",
             "try_number": 0,
-            "start_date": "2026-11-15T12:08:33.737022Z",
-            "end_date": "2026-11-15T12:08:33.737022Z"
+            "start_date": "2026-11-15T15:00:46.647062Z",
+            "end_date": "2026-11-15T15:00:46.647062Z"
           },
           {
             "task_id": "validate",
             "state": "failed",
             "try_number": 2,
-            "start_date": "2026-11-15T12:08:27.922540Z",
-            "end_date": "2026-11-15T12:08:30.882129Z"
+            "start_date": "2026-11-15T15:00:40.627438Z",
+            "end_date": "2026-11-15T15:00:43.200212Z"
           }
         ]
       },
       "error": null,
-      "request_id": "b7e8eeb7224f4bb180b80df5bba6bcce"
+      "request_id": "305a6f716706454c81a94398fec64e73"
     },
     {
       "id": "tool",
       "tool": "airflow_task_logs",
       "status": "ok",
-      "observed_at": "2026-11-15T12:08:35.685789+00:00",
+      "observed_at": "2026-11-15T15:00:49.365961+00:00",
       "data": {
         "dag_id": "iris_training",
-        "run_id": "manual__agent_9ab1c57b0dee4d5c9367ca40037aa76f",
+        "run_id": "manual__agent_03911bfcbe8646e4b33d511d32391e9f",
         "task_id": "validate",
         "logs": {
           "content": [
             {
               "event": "::group::Log message source details",
               "sources": [
-                "/opt/airflow/logs/dag_id=iris_training/run_id=manual__agent_9ab1c57b0dee4d5c9367ca40037aa76f/task_id=validate/attempt=2.log"
+                "/opt/airflow/logs/dag_id=iris_training/run_id=manual__agent_03911bfcbe8646e4b33d511d32391e9f/task_id=validate/attempt=2.log"
               ]
             },
             {
               "event": "::endgroup::"
             },
             {
-              "timestamp": "2026-11-15T12:08:28.015127Z",
+              "timestamp": "2026-11-15T15:00:40.694320Z",
               "event": "DAG bundles loaded: dags-folder",
               "level": "info",
               "logger": "airflow.dag_processing.bundles.manager.DagBundlesManager"
             },
             {
-              "timestamp": "2026-11-15T12:08:28.015930Z",
+              "timestamp": "2026-11-15T15:00:40.694799Z",
               "event": "Filling up the DagBag from /opt/project/dags/training_pipeline.py",
               "level": "info",
               "logger": "airflow.models.dagbag.DagBag"
             },
             {
-              "timestamp": "2026-11-15T12:08:30.851477Z",
+              "timestamp": "2026-11-15T15:00:43.175686Z",
               "event": "Task failed with exception",
               "level": "error",
               "logger": "task",
@@ -208,7 +208,7 @@
         }
       },
       "error": null,
-      "request_id": "b7e8eeb7224f4bb180b80df5bba6bcce"
+      "request_id": "305a6f716706454c81a94398fec64e73"
     }
   ]
 }

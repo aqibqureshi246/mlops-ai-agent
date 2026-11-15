@@ -1,70 +1,70 @@
 {
-  "run_id": "manual__agent_c6930cf0c212499bb6d98ddfceff116f",
+  "run_id": "manual__agent_c1943827aa264a279ed2d833d8c1ec01",
   "injection": "none",
   "evidence": [
     {
       "id": "confirmation",
       "tool": "airflow_trigger_training",
       "status": "ok",
-      "observed_at": "2026-11-15T12:09:21.387705+00:00",
+      "observed_at": "2026-11-15T15:01:48.980285+00:00",
       "data": {
         "dag_id": "iris_training",
-        "run_id": "manual__agent_c6930cf0c212499bb6d98ddfceff116f",
+        "run_id": "manual__agent_c1943827aa264a279ed2d833d8c1ec01",
         "state": "queued",
         "note": "Submission acknowledged; inspect task statuses until a terminal state."
       },
       "error": null,
-      "request_id": "4be720883575453489ca03da894f857b"
+      "request_id": "6200849f06c9444ba744ee3605a5b85a"
     },
     {
       "id": "tool",
       "tool": "airflow_task_instances",
       "status": "ok",
-      "observed_at": "2026-11-15T12:09:39.613551+00:00",
+      "observed_at": "2026-11-15T15:02:25.333828+00:00",
       "data": {
         "dag_id": "iris_training",
-        "run_id": "manual__agent_c6930cf0c212499bb6d98ddfceff116f",
+        "run_id": "manual__agent_c1943827aa264a279ed2d833d8c1ec01",
         "tasks": [
           {
             "task_id": "validate",
             "state": "success",
             "try_number": 1,
-            "start_date": "2026-11-15T12:09:22.228838Z",
-            "end_date": "2026-11-15T12:09:25.087907Z"
+            "start_date": "2026-11-15T15:01:50.011517Z",
+            "end_date": "2026-11-15T15:01:52.598319Z"
           },
           {
             "task_id": "preprocess",
             "state": "success",
             "try_number": 1,
-            "start_date": "2026-11-15T12:09:25.201239Z",
-            "end_date": "2026-11-15T12:09:28.105195Z"
+            "start_date": "2026-11-15T15:01:57.652570Z",
+            "end_date": "2026-11-15T15:02:00.291076Z"
           },
           {
             "task_id": "train",
             "state": "success",
             "try_number": 1,
-            "start_date": "2026-11-15T12:09:28.346398Z",
-            "end_date": "2026-11-15T12:09:31.230613Z"
+            "start_date": "2026-11-15T15:02:05.346209Z",
+            "end_date": "2026-11-15T15:02:07.988101Z"
           },
           {
             "task_id": "evaluate_mlflow",
             "state": "success",
             "try_number": 1,
-            "start_date": "2026-11-15T12:09:32.356383Z",
-            "end_date": "2026-11-15T12:09:35.657168Z"
+            "start_date": "2026-11-15T15:02:13.044225Z",
+            "end_date": "2026-11-15T15:02:15.851214Z"
           },
           {
             "task_id": "quality_gate",
             "state": "success",
             "try_number": 1,
-            "start_date": "2026-11-15T12:09:36.328732Z",
-            "end_date": "2026-11-15T12:09:39.215573Z"
+            "start_date": "2026-11-15T15:02:20.906448Z",
+            "end_date": "2026-11-15T15:02:23.636249Z"
           }
         ],
         "failed_tasks": []
       },
       "error": null,
-      "request_id": "4be720883575453489ca03da894f857b"
+      "request_id": "6200849f06c9444ba744ee3605a5b85a"
     }
   ]
 }

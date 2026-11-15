@@ -1,11 +1,11 @@
 {
-  "request_id": "0c5c52398c4e4038a40e4021ceeffcb4",
+  "request_id": "d6b95314f6604c30ab452a5e30f5c7fc",
   "evidence": [
     {
       "id": "tool",
       "tool": "kubernetes_deployments",
       "status": "ok",
-      "observed_at": "2026-11-15T12:11:19.415516+00:00",
+      "observed_at": "2026-11-15T15:03:59.357970+00:00",
       "data": {
         "namespace": "mlops",
         "deployments": [
@@ -17,9 +17,9 @@
             "generation": 1,
             "observed_generation": 1,
             "images": [
-              "mlops-prediction:878826d96e14"
+              "mlops-prediction:f9a44234ef69"
             ],
-            "model_run_id": "878826d96e144a08ae7e8c2fdeb0a21e",
+            "model_run_id": "f9a44234ef694ecbad7686c1b9c8ff1c",
             "conditions": [
               {
                 "type": "Available",
@@ -36,18 +36,18 @@
         ]
       },
       "error": null,
-      "request_id": "0c5c52398c4e4038a40e4021ceeffcb4"
+      "request_id": "d6b95314f6604c30ab452a5e30f5c7fc"
     },
     {
       "id": "tool",
       "tool": "kubernetes_pods",
       "status": "ok",
-      "observed_at": "2026-11-15T12:11:19.425445+00:00",
+      "observed_at": "2026-11-15T15:03:59.367242+00:00",
       "data": {
         "namespace": "mlops",
         "pods": [
           {
-            "name": "prediction-api-7bfdb9c48d-9szhh",
+            "name": "prediction-api-5758c6cd66-gbbdl",
             "phase": "Running",
             "conditions": [
               {
@@ -87,7 +87,7 @@
             ]
           },
           {
-            "name": "prediction-api-7bfdb9c48d-xcj6z",
+            "name": "prediction-api-5758c6cd66-j8hdb",
             "phase": "Running",
             "conditions": [
               {
@@ -129,20 +129,20 @@
         ]
       },
       "error": null,
-      "request_id": "0c5c52398c4e4038a40e4021ceeffcb4"
+      "request_id": "d6b95314f6604c30ab452a5e30f5c7fc"
     },
     {
       "id": "tool",
       "tool": "kubernetes_services",
       "status": "ok",
-      "observed_at": "2026-11-15T12:11:19.429588+00:00",
+      "observed_at": "2026-11-15T15:03:59.370049+00:00",
       "data": {
         "namespace": "mlops",
         "services": [
           {
             "name": "prediction-api",
             "type": "ClusterIP",
-            "cluster_ip": "10.96.51.165",
+            "cluster_ip": "10.96.44.68",
             "ports": [
               {
                 "port": 80,
@@ -153,118 +153,118 @@
         ]
       },
       "error": null,
-      "request_id": "0c5c52398c4e4038a40e4021ceeffcb4"
+      "request_id": "d6b95314f6604c30ab452a5e30f5c7fc"
     },
     {
       "id": "tool",
       "tool": "kubernetes_events",
       "status": "ok",
-      "observed_at": "2026-11-15T12:11:19.440266+00:00",
+      "observed_at": "2026-11-15T15:03:59.379677+00:00",
       "data": {
         "events": [
           {
-            "object": "prediction-api-7bfdb9c48d-9szhh",
+            "object": "prediction-api-5758c6cd66-gbbdl",
             "reason": "Scheduled",
-            "message": "Successfully assigned mlops/prediction-api-7bfdb9c48d-9szhh to mlops-a3-control-plane",
+            "message": "Successfully assigned mlops/prediction-api-5758c6cd66-gbbdl to mlops-a3-control-plane",
             "count": 1,
             "type": "Normal"
           },
           {
-            "object": "prediction-api-7bfdb9c48d-9szhh",
+            "object": "prediction-api-5758c6cd66-gbbdl",
             "reason": "Pulled",
-            "message": "Container image \"mlops-prediction:878826d96e14\" already present on machine",
+            "message": "Container image \"mlops-prediction:f9a44234ef69\" already present on machine",
             "count": 1,
             "type": "Normal"
           },
           {
-            "object": "prediction-api-7bfdb9c48d-9szhh",
+            "object": "prediction-api-5758c6cd66-gbbdl",
             "reason": "Created",
             "message": "Created container: prediction-api",
             "count": 1,
             "type": "Normal"
           },
           {
-            "object": "prediction-api-7bfdb9c48d-9szhh",
+            "object": "prediction-api-5758c6cd66-gbbdl",
             "reason": "Started",
             "message": "Started container prediction-api",
             "count": 1,
             "type": "Normal"
           },
           {
-            "object": "prediction-api-7bfdb9c48d-9szhh",
-            "reason": "Unhealthy",
-            "message": "Startup probe failed: Get \"http://10.244.0.6:8000/health/live\": dial tcp 10.244.0.6:8000: connect: connection refused",
-            "count": 1,
-            "type": "Warning"
-          },
-          {
-            "object": "prediction-api-7bfdb9c48d-xcj6z",
-            "reason": "Scheduled",
-            "message": "Successfully assigned mlops/prediction-api-7bfdb9c48d-xcj6z to mlops-a3-control-plane",
-            "count": 1,
-            "type": "Normal"
-          },
-          {
-            "object": "prediction-api-7bfdb9c48d-xcj6z",
-            "reason": "Pulled",
-            "message": "Container image \"mlops-prediction:878826d96e14\" already present on machine",
-            "count": 1,
-            "type": "Normal"
-          },
-          {
-            "object": "prediction-api-7bfdb9c48d-xcj6z",
-            "reason": "Created",
-            "message": "Created container: prediction-api",
-            "count": 1,
-            "type": "Normal"
-          },
-          {
-            "object": "prediction-api-7bfdb9c48d-xcj6z",
-            "reason": "Started",
-            "message": "Started container prediction-api",
-            "count": 1,
-            "type": "Normal"
-          },
-          {
-            "object": "prediction-api-7bfdb9c48d-xcj6z",
+            "object": "prediction-api-5758c6cd66-gbbdl",
             "reason": "Unhealthy",
             "message": "Startup probe failed: Get \"http://10.244.0.5:8000/health/live\": dial tcp 10.244.0.5:8000: connect: connection refused",
             "count": 1,
             "type": "Warning"
           },
           {
-            "object": "prediction-api-7bfdb9c48d",
-            "reason": "SuccessfulCreate",
-            "message": "Created pod: prediction-api-7bfdb9c48d-xcj6z",
+            "object": "prediction-api-5758c6cd66-j8hdb",
+            "reason": "Scheduled",
+            "message": "Successfully assigned mlops/prediction-api-5758c6cd66-j8hdb to mlops-a3-control-plane",
             "count": 1,
             "type": "Normal"
           },
           {
-            "object": "prediction-api-7bfdb9c48d",
+            "object": "prediction-api-5758c6cd66-j8hdb",
+            "reason": "Pulled",
+            "message": "Container image \"mlops-prediction:f9a44234ef69\" already present on machine",
+            "count": 1,
+            "type": "Normal"
+          },
+          {
+            "object": "prediction-api-5758c6cd66-j8hdb",
+            "reason": "Created",
+            "message": "Created container: prediction-api",
+            "count": 1,
+            "type": "Normal"
+          },
+          {
+            "object": "prediction-api-5758c6cd66-j8hdb",
+            "reason": "Started",
+            "message": "Started container prediction-api",
+            "count": 1,
+            "type": "Normal"
+          },
+          {
+            "object": "prediction-api-5758c6cd66-j8hdb",
+            "reason": "Unhealthy",
+            "message": "Startup probe failed: Get \"http://10.244.0.6:8000/health/live\": dial tcp 10.244.0.6:8000: connect: connection refused",
+            "count": 1,
+            "type": "Warning"
+          },
+          {
+            "object": "prediction-api-5758c6cd66",
             "reason": "SuccessfulCreate",
-            "message": "Created pod: prediction-api-7bfdb9c48d-9szhh",
+            "message": "Created pod: prediction-api-5758c6cd66-j8hdb",
+            "count": 1,
+            "type": "Normal"
+          },
+          {
+            "object": "prediction-api-5758c6cd66",
+            "reason": "SuccessfulCreate",
+            "message": "Created pod: prediction-api-5758c6cd66-gbbdl",
             "count": 1,
             "type": "Normal"
           },
           {
             "object": "prediction-api",
             "reason": "ScalingReplicaSet",
-            "message": "Scaled up replica set prediction-api-7bfdb9c48d from 0 to 2",
+            "message": "Scaled up replica set prediction-api-5758c6cd66 from 0 to 2",
             "count": 1,
             "type": "Normal"
           }
         ]
       },
       "error": null,
-      "request_id": "0c5c52398c4e4038a40e4021ceeffcb4"
+      "request_id": "d6b95314f6604c30ab452a5e30f5c7fc"
     }
   ],
   "api_version": {
     "app_version": "1.0.0",
-    "model_run_id": "878826d96e144a08ae7e8c2fdeb0a21e",
+    "model_run_id": "f9a44234ef694ecbad7686c1b9c8ff1c",
     "dataset": {
-      "code.git_commit": "02c11e9cc742fe834443fc672ab36351e12a5e64",
-      "data.git_commit": "02c11e9cc742fe834443fc672ab36351e12a5e64",
+      "code.git_commit": "64673783c3e301569b7d04665dccc6afee1755a6",
+      "data.git_commit": "64673783c3e301569b7d04665dccc6afee1755a6",
       "data.hash": "4224576f0267bf88902f87f0f6200967",
       "data.pointer": "data/iris.csv.dvc"
     }
@@ -272,6 +272,6 @@
   "prediction": {
     "class_id": 0,
     "class_name": "setosa",
-    "model_run_id": "878826d96e144a08ae7e8c2fdeb0a21e"
+    "model_run_id": "f9a44234ef694ecbad7686c1b9c8ff1c"
   }
 }
