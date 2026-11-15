@@ -40,9 +40,9 @@ ConfigMap, probes, resource requests/limits and restricted container security se
 
 ## Validation record
 
-The live workflow verified the observations below. Actual run IDs, source revision and verification time are recorded at the end of this report.
+The live workflow verified the observations below. CI passed on Python 3.11 and 3.12; the Python 3.12 run recorded 59 passing tests and 86% statement coverage. Actual run IDs, source revision and verification time are recorded at the end of this report.
 
-| Evidence | Expected export | Status |
+| Evidence | Export | Status |
 |---|---|---|
 | Automated tests | evidence/automated-tests.json | 59 passed; 0 skipped; Python 3.12.16 on Linux |
 | Local dataset and remote | evidence/local-dvc.json | Hash matches; working and remote DVC status clean |
@@ -81,8 +81,9 @@ run IDs are recorded in evidence/pipeline-validation.json and the recovery expor
 ### Quality-gate rejection
 
 Injection: trigger iris_training with inject_failure=quality. Evaluation records its measured metrics,
-but the final gate explicitly rejects promotion. Verified outcome: training and evaluation can
-succeed while the gate fails, quality.passed is false and no approved bundle exists for that run.
+but the final gate explicitly rejects promotion. Verified outcome: validation, preprocessing,
+training and evaluation succeeded while the gate failed, quality.passed is false and no approved
+bundle exists for that run.
 Resolution: remove the injection, rerun and verify the gate and approved model provenance. Do not
 lower thresholds simply to pass a failing model. Actual logs are recorded in evidence/pipeline-quality.json.
 
@@ -110,6 +111,72 @@ DVC 3.59.2 failed with an import of the removed private pathspec symbol _DIR_MAR
 ## Published-source local verification
 
 The dataset was retrieved into an isolated worktree at commit 98dce180f083d5e64502fb3e5510c1797909a22e and its byte hash matched the DVC pointer. A real local file-backed MLflow training run recorded accuracy 0.9333333333 and macro F1 0.9333333333. Its 0.90 quality gate passed, and the approved bundle returned a successful readiness check, matching application provenance and a setosa prediction through FastAPI TestClient. The exported scope explicitly distinguishes these local checks from the separate real Airflow, Kubernetes and LLM demonstration exports.
+
+## Additional failures found during live verification
+
+The full demonstration exposed issues beyond the deliberately injected training failures. Each
+correction was checked in a later live run; the final execution record identifies the source revision
+used for the complete demonstration.
+
+| Run | Observed failure | Correction |
+|---|---|---|
+| [43637611564](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43637611564) | Airflow's SimpleAuthManager opened its password file in append/read mode, but the bind mount was read-only. | Allow the configured Airflow user to write that single ignored password file. |
+| [43701309970](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43701309970) | The report regression test imported under python -m pytest but failed under the pytest console entry point. | Load the standalone report module by its explicit file location. |
+| [43701421118](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43701421118) | Airflow parsed the DAG, but /auth/token failed because the JWT issuer was not a string. | Configure an explicit deployment issuer and retain redacted DAG-readiness observations. |
+| [43702093841](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43702093841) | The separate quality-gate task process tried to resolve proxied MLflow artifacts through its default local tracking location. | Initialize MLflow's tracking URI in that task; a regression test exercises actual remote artifact URI resolution after a process-state reset. |
+| [43702642679](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43702642679) | kind v0.26.0 could create the cluster but could not load an image into its containerd 2 node. | Pin kind v0.27.0, kubectl v1.32.2 and the matching Kubernetes node-image digest. The compatibility requirement is documented in the [kind release notes](https://github.com/kubernetes-sigs/kind/releases/tag/v0.27.0). |
+| [43703267625](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43703267625) | The small local LLM omitted requested observations and proposed invalid scope arguments. The collector correctly rejected three incomplete conversations. | Supply configured scope and an explicit read-only observation checklist, then give bounded reminders for missing evidence. Tests verify that reminders never execute tools automatically or authorize mutations. |
+
+An additional [3B-model run](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43705224325)
+completed dataset, Airflow and Kubernetes conversations but left model-detail and historical-data
+observations incomplete. The following experiments used the free local qwen2.5:7b model and limited each
+conversation's advertised tools to its declared read-only observation contract. General chat retains
+the full tool set. This reduces prompt size without replacing model-selected calls with a script.
+
+The remaining MLflow exceptions also exposed the same proxied-artifact context dependency in the
+agent registry: its explicit tracking client was configured, but the global URI used by MLflow's
+artifact repository resolver was not. A regression test first reproduced this failure with a real
+artifact URI resolver and a stubbed HTTP artifact listing, then passed after registry initialization
+set the configured tracking URI. The affected [7B run](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43707447375)
+was stopped before rerunning the corrected source. This integration failure is distinct from the
+invalid arguments proposed by the small model.
+
+The following [7B execution](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43708905387)
+still stopped planning after large MLflow comparison responses, before attempting the dependent
+run-details call. The planner context now keeps each comparison candidate's ID, status, time and
+metrics while retaining full metadata for the selected candidate. A captured response shrank from
+4,086 to 1,792 bytes; a regression test verifies that the full audit evidence is unchanged. Local CPU
+inference uses a 300-second request timeout and a bounded 1,024-token planning response. Exported
+planner failures include their exception class without disclosing credentials or raw exceptions.
+
+That [CPU run](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43711970736)
+completed model selection, Airflow and Kubernetes conversations, but repeated completed calls and
+invalid no-argument DVC calls consumed the job's one-hour limit. Completed required tools are now
+removed from subsequent planning rounds. Validation feedback lists rejected field names and issue
+types without echoing argument values; literal identifier hints are copied only from successful
+observations. The final demonstration returns to the faster local qwen2.5:3b model.
+
+Dataset-status reads now target Git-tracked DVC pointer files, rather than unrelated missing outputs
+from the optional local DVC training graph. A real DVC test verifies both a clean tracked dataset
+beside an unmaterialized pipeline and detection of changed dataset bytes. Airflow pipeline execution
+continues to be verified independently through its actual task states and logs.
+
+The collector records its required successful tools and model name in each conversation export.
+The LLM still selects every tool and argument; the registry executes actual adapter calls. If the
+model stops early, cannot access a service or reaches its round limit, missing evidence remains
+explicit and full-verification publication fails. A checklist is not a replacement for observations.
+
+## Cost and lifetime of the demonstration
+
+The verification uses a standard Linux runner for this public GitHub repository, local Docker
+services, an ephemeral kind cluster and the local qwen2.5:3b model through Ollama. The hosted-model
+workflow input is disabled. No paid hosting or hosted LLM service is needed. Services and the cluster
+are torn down after the run; exported observations are the submission evidence, not a permanently
+hosted prediction endpoint.
+
+GitHub documents standard hosted runners as free for public repositories in its
+[runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+
 
 ## Verified live execution record
 

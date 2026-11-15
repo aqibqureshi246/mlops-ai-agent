@@ -19,7 +19,7 @@ and the [engineering defense guide](docs/defense-guide.md).
 ## Requirements
 
 - Python 3.11 or 3.12, Git, Docker Desktop with Linux containers and Docker Compose.
-- kubectl and kind for the local Kubernetes demonstration.
+- kubectl v1.32.2 and kind v0.27.0 for the pinned local Kubernetes demonstration.
 - An OpenAI-compatible model with tool calling. A local Ollama profile is provided; alternatively
   configure a hosted model in the ignored .env file. Never put keys in Git or chat transcripts.
 - Allow sufficient memory and disk space for Airflow, PostgreSQL, MLflow, kind and a local LLM.
@@ -109,7 +109,7 @@ Airflow remains the required orchestration demonstration; a local run is not a s
 ## 6. Deploy the prediction service on Kubernetes
 
 ~~~text
-kind create cluster --name mlops-a3
+kind create cluster --name mlops-a3 --image kindest/node:v1.32.2@sha256:f226345927d7e348497136874b6d207e0b32cc52154ad8323129352923a3142f
 python scripts/deploy.py --bundle artifacts/<successful-run-hash>/approved --confirm
 python scripts/configure_kube_access.py --confirm
 kubectl --context kind-mlops-a3 -n mlops get deployments,pods,services
@@ -181,9 +181,19 @@ run it can commit sanitized evidence to main; this is controlled by the publish_
 
 For a hosted model, add the LLM_API_KEY Actions secret and LLM_BASE_URL and LLM_MODEL repository
 variables and explicitly enable the use_hosted_llm workflow input. The key must remain in the secret
-store. The workflow defaults to free local Ollama with qwen2.5:3b even when a hosted key is configured. Model quality,
-runner resources and external availability can affect a live run.
+store. The workflow defaults to free local Ollama with qwen2.5:3b even when a hosted key is configured.
+Local inference allows 300 seconds per request. Model quality, runner resources and external
+availability can affect a live run.
 The workflow does not claim success until the observations are complete.
+
+The collector supplies configured scope and a required observation checklist. After each successful
+call it offers only the remaining read tools, with reference identifiers from actual observations.
+The LLM selects each tool and its arguments; missing evidence remains an explicit failure.
+
+[Verified live run 43727102101](https://github.com/aqibqureshi246/mlops-ai-agent/actions/runs/43727102101)
+completed 59 tests, isolated DVC retrieval, Airflow failure/recovery investigations, Kubernetes
+inference and all five conversations. The exported verification summary identifies the exact source
+revision. The demonstration cluster is temporary; rerun the workflow or local setup to start services.
 
 ## Submission contents
 
