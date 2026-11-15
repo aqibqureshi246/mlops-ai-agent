@@ -1,6 +1,14 @@
+import importlib.util
+from pathlib import Path
+
 import pytest
 
-from scripts.update_report import verify_pipeline_states
+spec = importlib.util.spec_from_file_location(
+    "update_report", Path(__file__).resolve().parents[1] / "scripts/update_report.py"
+)
+report = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(report)
+verify_pipeline_states = report.verify_pipeline_states
 
 TASKS = ("validate", "preprocess", "train", "evaluate_mlflow", "quality_gate")
 

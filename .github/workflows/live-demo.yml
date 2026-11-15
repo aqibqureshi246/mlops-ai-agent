@@ -99,4 +99,7 @@ jobs:
             docs/technical-report.md
       - name: Shut down demonstration services
         if: always()
-        run: docker compose --profile local-llm down
+        run: |
+          if [ -f .env ]; then
+            docker compose --profile local-llm down
+          fi
