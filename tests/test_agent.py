@@ -158,6 +158,20 @@ def test_required_observations_never_fall_back_to_automatic_tool_execution():
     )
 
 
+def test_explicit_observation_contract_limits_the_models_available_tools():
+    handler = Mock(return_value={"replicas": 2})
+    registry = registry_with(handler)
+    registry.add(Tool("unrelated", "Unneeded tool", EmptyInput, Mock()))
+    planner = Mock(wraps=ScriptedPlanner([("inspect", {})]))
+    result = Orchestrator(registry, planner, Settings()).chat(
+        "Check health", required_tools={"inspect"}
+    )
+    definitions = planner.next_calls.call_args.args[1]
+    assert {d["function"]["name"] for d in definitions} == {"inspect"}
+    assert result.evidence[0].data == {"replicas": 2}
+    handler.assert_called_once_with()
+
+
 def test_observation_requirements_cannot_authorize_mutations():
     handler = Mock()
     with pytest.raises(ValueError, match="read-only"):

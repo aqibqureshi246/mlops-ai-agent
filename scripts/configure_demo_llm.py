@@ -20,14 +20,18 @@ def main():
         set_key(env, "MLOPS_LLM_MODEL", model)
         print("Hosted tool-calling model configured without printing credentials.")
     else:
+        model = os.environ.get("LOCAL_LLM_MODEL", "qwen2.5:3b")
         subprocess.run(
             ["docker", "compose", "--profile", "local-llm", "up", "-d", "ollama"], check=True
         )
         subprocess.run(
-            ["docker", "compose", "exec", "-T", "ollama", "ollama", "pull", "qwen2.5:3b"],
+            ["docker", "compose", "exec", "-T", "ollama", "ollama", "pull", model],
             check=True,
         )
-        print("Local tool-calling model ready.")
+        set_key(env, "MLOPS_LLM_MODEL", model)
+        set_key(env, "MLOPS_LLM_BASE_URL", "http://localhost:11434/v1")
+        set_key(env, "MLOPS_LLM_API_KEY", "ollama")
+        print(f"Local tool-calling model ready: {model}.")
 
 
 if __name__ == "__main__":

@@ -251,11 +251,14 @@ class Orchestrator:
             )
         evidence, pending, planner_errors = [], [], []
         seen = set()
+        definitions = [
+            definition
+            for definition in self.registry.definitions()
+            if not required or definition["function"]["name"] in required
+        ]
         for _ in range(self.settings.max_rounds):
             try:
-                calls, assistant_message = self.planner.next_calls(
-                    messages, self.registry.definitions()
-                )
+                calls, assistant_message = self.planner.next_calls(messages, definitions)
             except Exception:
                 planner_errors.append(
                     "LLM planner unavailable or returned invalid structured arguments; no results were invented."

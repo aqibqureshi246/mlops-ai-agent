@@ -69,6 +69,7 @@ jobs:
           python scripts/export_cluster.py --api-url http://localhost:8000
       - name: Configure hosted LLM or local Ollama
         env:
+          LOCAL_LLM_MODEL: qwen2.5:7b
           HOSTED_LLM_KEY: ${{ inputs.use_hosted_llm && secrets.LLM_API_KEY || '' }}
           HOSTED_LLM_URL: ${{ vars.LLM_BASE_URL }}
           HOSTED_LLM_MODEL: ${{ vars.LLM_MODEL }}
